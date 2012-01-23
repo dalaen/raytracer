@@ -29,6 +29,10 @@ int main(int argc, char** argv)
     long nbPointsLight = 0;
     struct Camera* cameras = NULL;
     long nbCameras = 0;
+    struct TriangleMesh* triangles = NULL;
+    long nbTriangles = 0;
+    
+    
     struct LightRay ray;
     struct Pixel blackColor;
     struct Distance distance;
@@ -61,8 +65,8 @@ int main(int argc, char** argv)
     
     if (ok)
     {
-        parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &pointsLight, &nbPointsLight, &cameras, &nbCameras);
-        printf("\nsphere.position.x = %s\n", spheres[0].name);
+        parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &pointsLight, &nbPointsLight, &cameras, &nbCameras, &triangles, &nbTriangles);
+        printf("\nsphere.position.x = %ld\n", triangles[0].vertexes[1].position.y);
     }
     /*
     // Création scène
@@ -99,7 +103,7 @@ int main(int argc, char** argv)
     makeOutput(&myImage);
     //*/
     
-    freeStructs(materials, nbMaterials, spheres, nbSpheres, pointsLight, nbPointsLight, cameras, nbCameras);
+    freeStructs(materials, nbMaterials, spheres, nbSpheres, pointsLight, nbPointsLight, cameras, nbCameras, triangles, nbTriangles);
     
     return (EXIT_SUCCESS);
 }

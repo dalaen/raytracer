@@ -74,6 +74,18 @@ extern "C" {
         struct Point3D direction; // à revoir
     };
     
+    struct TriangleMesh {
+        char* name;
+        long nbVertexes;
+        long nbFaces;
+        struct Vertex* vertexes;
+    };
+
+    struct Vertex {
+        long id;
+        struct Point3D position;
+    };
+    
     struct Image
     {
         long width;

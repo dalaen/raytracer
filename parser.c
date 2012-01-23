@@ -12,6 +12,8 @@
 #define initSphere(which) which.name = NULL; which.materialName = NULL
 #define initPointLight(which) which.name = NULL
 #define initCamera(which) which.name = NULL; which.projectionType = NULL
+#define initTriangleMesh(which) which.name = NULL; which.vertexes = NULL
+#define initFace(which, by) which.type = by
 
 struct Scene init_scene(long nbSphere, long width, long height)
 {
@@ -23,7 +25,7 @@ struct Scene init_scene(long nbSphere, long width, long height)
     return myNewScene;
 }
 
-void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMaterials, struct Sphere **outSphere, long* nbSpheres, struct PointLight **outPointLight, long* nbPointsLight, struct Camera **outCamera, long* nbCameras)
+void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMaterials, struct Sphere **outSphere, long* nbSpheres, struct PointLight **outPointLight, long* nbPointsLight, struct Camera **outCamera, long* nbCameras, struct TriangleMesh** outTriangle, long* nbTriangles)
 {
     char buffer[MAX_LINE_SIZE];
     char* trim;
@@ -68,6 +70,14 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
             else if (*nbCameras > 0)
                 *outCamera = (struct Camera*) realloc(outCamera, sizeof(struct Camera) * (*nbCameras + 1));
             (*outCamera)[(*nbCameras)++] = parse_camera(&nbBracketsOpen);
+        }
+        if (strstr(trim, "triangle_mesh") != NULL)
+        {
+            if (*nbTriangles == 0)
+                *outTriangle = (struct TriangleMesh*) malloc(sizeof(struct TriangleMesh));
+            else if (*nbTriangles > 0)
+                *outTriangle = (struct TriangleMesh*) realloc(outTriangle, sizeof(struct TriangleMesh) * (*nbTriangles + 1));
+            (*outTriangle)[(*nbTriangles)++] = parse_triangle(&nbBracketsOpen);
         }
     }
 }
@@ -128,7 +138,6 @@ struct Material parse_material(unsigned long* nbBracketsOpen)
     struct LineData currentLine;
     char buffer[MAX_LINE_SIZE];
     char* trim;
-    char* dump;
     long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
@@ -185,7 +194,6 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
     struct LineData currentLine;
     char buffer[MAX_LINE_SIZE];
     char* trim;
-    char* dump;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
     initSphere(result);
@@ -248,7 +256,6 @@ struct PointLight parse_pointLight(unsigned long* nbBracketsOpen)
     struct LineData currentLine;
     char buffer[MAX_LINE_SIZE];
     char* trim;
-    char* dump;
     long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
@@ -310,7 +317,6 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
     struct LineData currentLine;
     char buffer[MAX_LINE_SIZE];
     char* trim;
-    char* dump;
     long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
@@ -372,6 +378,119 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
     return result;
 }
 
+struct TriangleMesh parse_triangle(unsigned long* nbBracketsOpen)
+{
+    struct TriangleMesh result;
+    struct LineData currentLine;
+    char buffer[MAX_LINE_SIZE];
+    char* trim;
+    static long nbVertexDone = 0;
+    static long nbFaces = 0;
+    unsigned long onCall_bracketsOpen = *nbBracketsOpen;
+    
+    initTriangleMesh(result);
+    
+    do
+    {
+        readLine();
+        trim = buffer;
+        trim = trim(trim);
+        
+        // Function is called when "scene" text is matched
+        // Jumping over {
+        if (*trim == '{')
+        {
+            (*nbBracketsOpen)++;
+            continue; // Next line
+        }
+        else if (*trim == '}')
+        {
+            (*nbBracketsOpen)--;
+            continue; // Next line
+        }
+        if (is_comment(trim)) // Jump over comments
+            continue;
+        if (strlen(trim) == 0) // Blank line? Jump!
+            continue;
+        
+        currentLine = parse_line(trim);
+        
+        if (strcmp("name", currentLine.attributeName) == 0)
+        {
+            result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
+            strcpy(result.name, currentLine.attributeValue.stringAttribute);
+            free(currentLine.attributeValue.stringAttribute);
+        }
+        else if (strcmp("number_of_vertexes", currentLine.attributeName) == 0)
+            result.nbVertexes = currentLine.attributeValue.longAttribute;
+        else if (strcmp("number_of_faces", currentLine.attributeName) == 0)
+            result.nbFaces = currentLine.attributeValue.longAttribute;
+        else if (strcmp("vertex", currentLine.attributeName) == 0)
+        {
+            if (nbVertexDone == 0)
+                result.vertexes = (struct Vertex*) malloc(sizeof(struct Vertex));
+            else if (nbVertexDone > 0)
+                result.vertexes = (struct Vertex*) realloc(result.vertexes, sizeof(struct Vertex) * (nbVertexDone + 1));
+            result.vertexes[nbVertexDone++] = parse_vertex(nbBracketsOpen);
+        }
+
+        free(currentLine.attributeName);
+    } while (*nbBracketsOpen > onCall_bracketsOpen);
+    
+    return result;
+}
+
+struct Vertex parse_vertex(unsigned long* nbBracketsOpen)
+{
+    struct Vertex result;
+    struct LineData currentLine;
+    char buffer[MAX_LINE_SIZE];
+    char* trim;
+    unsigned long onCall_bracketsOpen = *nbBracketsOpen;
+    
+    do
+    {
+        readLine();
+        trim = buffer;
+        trim = trim(trim);
+        
+        // Function is called when "scene" text is matched
+        // Jumping over {
+        if (*trim == '{')
+        {
+            (*nbBracketsOpen)++;
+            continue; // Next line
+        }
+        else if (*trim == '}')
+        {
+            (*nbBracketsOpen)--;
+            continue; // Next line
+        }
+        if (is_comment(trim)) // Jump over comments
+            continue;
+        if (strlen(trim) == 0) // Blank line? Jump!
+            continue;
+        
+        currentLine = parse_line(trim);
+        
+        if (strcmp("id", currentLine.attributeName) == 0)
+            result.id = currentLine.attributeValue.longAttribute;
+        else if (strcmp("position", currentLine.attributeName) == 0)
+        {
+            result.position.x = currentLine.attributeValue.arrayAttribute[0];
+            result.position.y = currentLine.attributeValue.arrayAttribute[1];
+            result.position.z = currentLine.attributeValue.arrayAttribute[2];
+        }
+            
+
+        free(currentLine.attributeName);
+    } while (*nbBracketsOpen > onCall_bracketsOpen);
+    
+    return result;
+}
+
+
+
 struct LineData parse_line(char* buffer)
 {
     struct LineData result;
@@ -388,7 +507,7 @@ struct LineData parse_line(char* buffer)
         result.attributeValue.stringAttribute[strlen(result.attributeValue.stringAttribute) - 1] = '\0';
         isString = 1;
     }
-    
+     
     argument = strtok(buffer, " ");
     result.attributeName = malloc(sizeof(char) * (strlen(argument) + 1));
     strcpy(result.attributeName, argument);
@@ -400,7 +519,7 @@ struct LineData parse_line(char* buffer)
     {
         if (isString) // Is it a string?
         {
-            //free(stringArg);
+            // Job already done, just keep the "else" working
         }
         else if (strchr(argument, '.') != NULL) // Is it a float number?
             result.attributeValue.floatAttribute = atof(argument);
@@ -444,12 +563,13 @@ enum Operation getOperation(char* operation)
     return NOT_EQUAL;
 }
 
-unsigned long count_indent(char* theString)
+unsigned long count_indent(const char* theString)
 {
     // This function is trimming too
     unsigned long count = 0;
+    char* buffer = theString;
     
-    while (strchr(theString++, '\t') != NULL)
+    while (*buffer++ == '\t')
         count++;
     
     return count;
@@ -477,7 +597,7 @@ char* rtrim(char *s)
     return s;
 }
 
-void freeStructs(struct Material *outMaterial, long nbMaterials, struct Sphere *outSphere, long nbSpheres, struct PointLight *outPointLight, long nbPointsLight, struct Camera *outCamera, long nbCameras)
+void freeStructs(struct Material *outMaterial, long nbMaterials, struct Sphere *outSphere, long nbSpheres, struct PointLight *outPointLight, long nbPointsLight, struct Camera *outCamera, long nbCameras, struct TriangleMesh *outTriangle, long nbTriangles)
 {
     long i;
     
@@ -515,5 +635,15 @@ void freeStructs(struct Material *outMaterial, long nbMaterials, struct Sphere *
             free(outCamera[i].projectionType);
         }
         free(outCamera);
+    }
+    if (outTriangle != NULL)
+    {
+        for (i = 0 ; i < nbTriangles ; i++)
+        {
+            free(outTriangle[i].name);
+            if (outTriangle[i].vertexes != NULL)
+                free(outTriangle[i].vertexes);
+        }
+        free(outTriangle);
     }
 }
