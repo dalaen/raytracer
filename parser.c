@@ -19,7 +19,7 @@ struct Scene init_scene(long nbSphere, long width, long height)
     myNewScene.nbSphere = nbSphere;
     myNewScene.width = width;
     myNewScene.height = height;
-
+    
     return myNewScene;
 }
 
@@ -28,7 +28,7 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
     char buffer[MAX_LINE_SIZE];
     char* trim;
     unsigned long nbBracketsOpen = 0;
-
+    
     while (readLine() != NULL)
     {
         trim = buffer;
@@ -79,13 +79,13 @@ struct Scene parse_scene(unsigned long* nbBracketsOpen)
     char buffer[MAX_LINE_SIZE];
     char* trim;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
-
+    
     do
     {
         readLine();
         trim = buffer;
         trim = trim(trim);
-
+        
         // Function is called when "scene" text is matched
         // Jumping over {
         if (*trim == '{')
@@ -102,9 +102,9 @@ struct Scene parse_scene(unsigned long* nbBracketsOpen)
             continue;
         if (strlen(trim) == 0) // Blank line? Jump!
             continue;
-
-        currentLine = parse_line(trim, trim);
-
+        
+        currentLine = parse_line(trim);
+        
         if (strcmp("number_of_materials", currentLine.attributeName) == 0)
             result.nbMaterial = currentLine.attributeValue.longAttribute;
         else if (strcmp("number_of_spheres", currentLine.attributeName) == 0)
@@ -115,7 +115,8 @@ struct Scene parse_scene(unsigned long* nbBracketsOpen)
             result.nbPointLight = currentLine.attributeValue.longAttribute;
         else if (strcmp("number_of_cameras", currentLine.attributeName) == 0)
             result.nbCamera = currentLine.attributeValue.longAttribute;
-
+        
+        free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
 
     return result;
@@ -130,18 +131,15 @@ struct Material parse_material(unsigned long* nbBracketsOpen)
     char* dump;
     long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
-
+    
     initMaterial(result);
-
+    
     do
     {
         readLine();
         trim = buffer;
         trim = trim(trim);
-        dump = malloc(sizeof(char) * strlen(trim));
-        strcpy(dump, trim);
-        dump[strlen(dump) - 1] = '\0';
-
+        
         // Function is called when "scene" text is matched
         // Jumping over {
         if (*trim == '{')
@@ -158,13 +156,14 @@ struct Material parse_material(unsigned long* nbBracketsOpen)
             continue;
         if (strlen(trim) == 0) // Blank line? Jump!
             continue;
-
-        currentLine = parse_line(trim, dump);
-
+        
+        currentLine = parse_line(trim);
+        
         if (strcmp("name", currentLine.attributeName) == 0)
         {
             result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
             strcpy(result.name, currentLine.attributeValue.stringAttribute);
+            free(currentLine.attributeValue.stringAttribute);
         }
         else if (strcmp("diffuse_color", currentLine.attributeName) == 0)
         {
@@ -174,9 +173,9 @@ struct Material parse_material(unsigned long* nbBracketsOpen)
         else if (strcmp("reflection_coefficient", currentLine.attributeName) == 0)
             result.reflectionCoefficient = currentLine.attributeValue.floatAttribute;
 
-        free(dump);
+        free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
-
+    
     return result;
 }
 
@@ -188,18 +187,15 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
     char* trim;
     char* dump;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
-
+    
     initSphere(result);
-
+    
     do
     {
         readLine();
         trim = buffer;
         trim = trim(trim);
-        dump = malloc(sizeof(char) * (strlen(trim) + 1));
-        strcpy(dump,trim);
-        dump[strlen(dump) - 1] = '\0';
-
+        
         // Function is called when "scene" text is matched
         // Jumping over {
         if (*trim == '{')
@@ -216,13 +212,14 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
             continue;
         if (strlen(trim) == 0) // Blank line? Jump!
             continue;
-
-        currentLine = parse_line(trim, dump);
-
+        
+        currentLine = parse_line(trim);
+        
         if (strcmp("name", currentLine.attributeName) == 0)
         {
             result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
             strcpy(result.name, currentLine.attributeValue.stringAttribute);
+            free(currentLine.attributeValue.stringAttribute);
         }
         else if (strcmp("position", currentLine.attributeName) == 0)
         {
@@ -236,11 +233,12 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
         {
             result.materialName = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
             strcpy(result.materialName, currentLine.attributeValue.stringAttribute);
+            free(currentLine.attributeValue.stringAttribute);
         }
-
-        free(dump);
+        
+        free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
-
+    
     return result;
 }
 
@@ -253,18 +251,15 @@ struct PointLight parse_pointLight(unsigned long* nbBracketsOpen)
     char* dump;
     long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
-
+    
     initPointLight(result);
-
+    
     do
     {
         readLine();
         trim = buffer;
         trim = trim(trim);
-        dump = malloc(sizeof(char) * (strlen(trim) + 1));
-        strcpy(dump,trim);
-        dump[strlen(dump) - 1] = '\0';
-
+        
         // Function is called when "scene" text is matched
         // Jumping over {
         if (*trim == '{')
@@ -281,13 +276,15 @@ struct PointLight parse_pointLight(unsigned long* nbBracketsOpen)
             continue;
         if (strlen(trim) == 0) // Blank line? Jump!
             continue;
-
-        currentLine = parse_line(trim, dump);
-
+        
+        currentLine = parse_line(trim);
+        
         if (strcmp("name", currentLine.attributeName) == 0)
         {
             result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
             strcpy(result.name, currentLine.attributeValue.stringAttribute);
+            free(currentLine.attributeValue.stringAttribute);
+            
         }
         else if (strcmp("position", currentLine.attributeName) == 0)
         {
@@ -301,9 +298,9 @@ struct PointLight parse_pointLight(unsigned long* nbBracketsOpen)
                 result.colorIntensity[i] = currentLine.attributeValue.arrayAttribute[i];
         }
 
-        free(dump);
+        free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
-
+    
     return result;
 }
 
@@ -316,18 +313,15 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
     char* dump;
     long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
-
+    
     initCamera(result);
-
+    
     do
     {
         readLine();
         trim = buffer;
         trim = trim(trim);
-        dump = malloc(sizeof(char) * (strlen(trim) + 1));
-        strcpy(dump,trim);
-        dump[strlen(dump) - 1] = '\0';
-
+        
         // Function is called when "scene" text is matched
         // Jumping over {
         if (*trim == '{')
@@ -344,13 +338,14 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
             continue;
         if (strlen(trim) == 0) // Blank line? Jump!
             continue;
-
-        currentLine = parse_line(trim, dump);
-
+        
+        currentLine = parse_line(trim);
+        
         if (strcmp("name", currentLine.attributeName) == 0)
         {
             result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.name, currentLine.attributeValue.stringAttribute);
+            strcpy(result.name, currentLine.attributeValue.stringAttribute);   
+            free(currentLine.attributeValue.stringAttribute);
         }
         else if (strcmp("position", currentLine.attributeName) == 0)
         {
@@ -367,37 +362,45 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
         else if (strcmp("projection_type", currentLine.attributeName) == 0)
         {
             result.projectionType = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.projectionType, currentLine.attributeValue.stringAttribute);
+            strcpy(result.projectionType, currentLine.attributeValue.stringAttribute);  
+            free(currentLine.attributeValue.stringAttribute);
         }
-
-        free(dump);
+        
+        free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
-
+    
     return result;
 }
 
-struct LineData parse_line(char* buffer, const char* dumpBuffer)
+struct LineData parse_line(char* buffer)
 {
     struct LineData result;
     char* argument;
     char* stringArg;
     long isString = 0;
     long temp = 0;
-
+    
+    result.attributeValue.stringAttribute = NULL; // Initialization required
+    if ((stringArg = strchr(buffer, '"')) != NULL) // there is a string
+    {
+        result.attributeValue.stringAttribute = malloc(sizeof(char) * (strlen(stringArg)));
+        strcpy(result.attributeValue.stringAttribute, strchr(buffer, '"') + 1);
+        result.attributeValue.stringAttribute[strlen(result.attributeValue.stringAttribute) - 1] = '\0';
+        isString = 1;
+    }
+    
     argument = strtok(buffer, " ");
     result.attributeName = malloc(sizeof(char) * (strlen(argument) + 1));
     strcpy(result.attributeName, argument);
-
+    
     if (nextArgument() != NULL) // More than 1 argument
         result.operation = getOperation(argument);
-
+    
     if (nextArgument() != NULL)
     {
-        if ((stringArg = strchr(dumpBuffer, '"')) != NULL) // Is it a string?
+        if (isString) // Is it a string?
         {
-            result.attributeValue.stringAttribute = malloc(sizeof(char) * (strlen(++stringArg) + 1));
-            strcpy(result.attributeValue.stringAttribute, stringArg);
-            isString = 1;
+            //free(stringArg);
         }
         else if (strchr(argument, '.') != NULL) // Is it a float number?
             result.attributeValue.floatAttribute = atof(argument);
@@ -414,7 +417,7 @@ struct LineData parse_line(char* buffer, const char* dumpBuffer)
         nextArgument();
         result.attributeValue.arrayAttribute[2] = atol(argument);
     }
-
+    
     return result;
 }
 
@@ -445,10 +448,10 @@ unsigned long count_indent(char* theString)
 {
     // This function is trimming too
     unsigned long count = 0;
-
+    
     while (strchr(theString++, '\t') != NULL)
         count++;
-
+    
     return count;
 }
 
@@ -477,8 +480,8 @@ char* rtrim(char *s)
 void freeStructs(struct Material *outMaterial, long nbMaterials, struct Sphere *outSphere, long nbSpheres, struct PointLight *outPointLight, long nbPointsLight, struct Camera *outCamera, long nbCameras)
 {
     long i;
-
-
+    
+    
     if (outMaterial != NULL)
     {
         for (i = 0 ; i < nbMaterials ; i++)
