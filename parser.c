@@ -222,11 +222,7 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
         if (strcmp("name", currentLine.attributeName) == 0)
             result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
-        {
-            result.origin.x = currentLine.attributeValue.arrayAttribute[0];
-            result.origin.y = currentLine.attributeValue.arrayAttribute[1];
-            result.origin.z = currentLine.attributeValue.arrayAttribute[2];
-        }
+            result.origin = array2position(currentLine.attributeValue.arrayAttribute);
         else if (strcmp("radius", currentLine.attributeName) == 0)
             result.radius = currentLine.attributeValue.floatAttribute;
         else if (strcmp("material", currentLine.attributeName) == 0)
@@ -277,11 +273,7 @@ struct PointLight parse_pointLight(unsigned long* nbBracketsOpen)
         if (strcmp("name", currentLine.attributeName) == 0)
             result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
-        {
-            result.position.x = currentLine.attributeValue.arrayAttribute[0];
-            result.position.y = currentLine.attributeValue.arrayAttribute[1];
-            result.position.z = currentLine.attributeValue.arrayAttribute[2];
-        }
+            result.position = array2position(currentLine.attributeValue.arrayAttribute);
         else if (strcmp("color_intensity", currentLine.attributeName) == 0)
         {
             for (i = 0 ; i < 2 ; i++)
@@ -333,23 +325,11 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
         if (strcmp("name", currentLine.attributeName) == 0)
             result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
-        {
-            result.position.x = currentLine.attributeValue.arrayAttribute[0];
-            result.position.y = currentLine.attributeValue.arrayAttribute[1];
-            result.position.z = currentLine.attributeValue.arrayAttribute[2];
-        }
+            result.position = array2position(currentLine.attributeValue.arrayAttribute);
         else if (strcmp("look_at", currentLine.attributeName) == 0)
-        {
-            result.lookAt.x = currentLine.attributeValue.arrayAttribute[0];
-            result.lookAt.y = currentLine.attributeValue.arrayAttribute[1];
-            result.lookAt.z = currentLine.attributeValue.arrayAttribute[2];
-        }
+            result.lookAt = array2position(currentLine.attributeValue.arrayAttribute);
         else if (strcmp("projection_type", currentLine.attributeName) == 0)
-        {
-            result.projectionType = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.projectionType, currentLine.attributeValue.stringAttribute);  
-            free(currentLine.attributeValue.stringAttribute);
-        }
+            result.projectionType = clean_strdup(currentLine.attributeValue.stringAttribute);
         
         free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
@@ -451,12 +431,7 @@ struct Vertex parse_vertex(unsigned long* nbBracketsOpen)
         if (strcmp("id", currentLine.attributeName) == 0)
             result.id = currentLine.attributeValue.longAttribute;
         else if (strcmp("position", currentLine.attributeName) == 0)
-        {
-            result.position.x = currentLine.attributeValue.arrayAttribute[0];
-            result.position.y = currentLine.attributeValue.arrayAttribute[1];
-            result.position.z = currentLine.attributeValue.arrayAttribute[2];
-        }
-            
+            result.position = array2position(currentLine.attributeValue.arrayAttribute);            
 
         free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
@@ -707,4 +682,14 @@ char* clean_strdup(char* source) // Inline or not inline ?
     temp = strdup(source);
     free(source); // Good clean dog.
     return temp;
+}
+
+struct Point3D array2position(unsigned long input[])
+{
+    struct Point3D result;
+    result.x = input[0];
+    result.y = input[1];
+    result.z = input[2];
+    
+    return result;
 }
