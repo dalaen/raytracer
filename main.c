@@ -13,6 +13,7 @@
 #include "spheres.h"
 #include "imagetreatment.h"
 #include "parser.h"
+#define getArrayLocationByI(i) 2*i+2
 
 /*
  * 
@@ -33,10 +34,13 @@ int main(int argc, char** argv)
     long nbTriangles = 0;
     
     
+    char* sceneFilename = NULL;
+    char* renderFilename = NULL;
+    char** whichFilename[2] = {NULL};
     struct LightRay ray;
     struct Pixel blackColor;
     struct Distance distance;
-    long i;
+    long i = 0;
     long ok;                    // Determines if it's ok to continue
     long x;
     long y;
@@ -53,21 +57,47 @@ int main(int argc, char** argv)
     //*/
     
     // CLI management
-    if (argc == 2) // Computes only one file now
+    if (argc >= 3) // First argument
     {
-        // Must be using freopen()...
-        if (strcmp(strrchr(argv[1], '.') + 1, "conf") == 0) // If file's extension is "conf"
+        if (strcmp(argv[1], "-s") == 0) // Scene file following
         {
-            freopen(argv[1], "r", stdin); // Moving the argument's file to stdin, to be read from scanf()
-            ok = 1;
+            whichFilename[i++] = &sceneFilename;
+        }
+        else if (strcmp(argv[1], "-r") == 0)
+        {
+            whichFilename[i++] = &renderFilename;
+        }
+    }
+    if (argc >= 5) // Two arguments
+    {
+        if (strcmp(argv[3], "-s") == 0 && whichFilename[0] != &sceneFilename) // Scene file following
+        {
+            whichFilename[i++] = &sceneFilename;
+        }
+        else if (strcmp(argv[3], "-r") == 0 && whichFilename[0] != &renderFilename)
+        {
+            whichFilename[i++] = &renderFilename;
+        }
+    }
+
+    while (--i >= 0)
+    {
+        printf("%s", argv[2]);
+        if (strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "conf") == 0) // If file's extension is "conf"
+        {
+            *whichFilename[i] = malloc(sizeof(char) * strlen(argv[getArrayLocationByI(i)]) + 1);
+            strcpy(*whichFilename[i], argv[getArrayLocationByI(i)]);
         }
     }
     
-    if (ok)
+    if (freopen(sceneFilename, "r", stdin) == NULL)
     {
-        parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &pointsLight, &nbPointsLight, &cameras, &nbCameras, &triangles, &nbTriangles);
-        printf("\nsphere.position.x = %ld\n", triangles[0].vertexes[1].position.y);
+        printf("Erreur lors de l'import du fichier : %s", sceneFilename);
+        return(EXIT_FAILURE);
     }
+    
+    parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &pointsLight, &nbPointsLight, &cameras, &nbCameras, &triangles, &nbTriangles);
+    printf("\nsphere.position.x = %ld\n", triangles[0].vertexes[1].position.y);
     /*
     // Création scène
     myScene.spheres[0] = init_sphere(233, 290, 200, 100, MAX_COLOR, 0, 0);
@@ -103,6 +133,8 @@ int main(int argc, char** argv)
     makeOutput(&myImage);
     //*/
     
+    free(renderFilename);
+    free(sceneFilename);
     freeStructs(materials, nbMaterials, spheres, nbSpheres, pointsLight, nbPointsLight, cameras, nbCameras, triangles, nbTriangles);
     
     return (EXIT_SUCCESS);
