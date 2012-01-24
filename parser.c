@@ -169,11 +169,7 @@ struct Material parse_material(unsigned long* nbBracketsOpen)
         currentLine = parse_line(trim);
         
         if (strcmp("name", currentLine.attributeName) == 0)
-        {
-            result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.name, currentLine.attributeValue.stringAttribute);
-            free(currentLine.attributeValue.stringAttribute);
-        }
+            result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("diffuse_color", currentLine.attributeName) == 0)
         {
             for (i = 0 ; i < 3 ; i++)
@@ -224,11 +220,7 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
         currentLine = parse_line(trim);
         
         if (strcmp("name", currentLine.attributeName) == 0)
-        {
-            result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.name, currentLine.attributeValue.stringAttribute);
-            free(currentLine.attributeValue.stringAttribute);
-        }
+            result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
         {
             result.origin.x = currentLine.attributeValue.arrayAttribute[0];
@@ -238,11 +230,7 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
         else if (strcmp("radius", currentLine.attributeName) == 0)
             result.radius = currentLine.attributeValue.floatAttribute;
         else if (strcmp("material", currentLine.attributeName) == 0)
-        {
-            result.materialName = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.materialName, currentLine.attributeValue.stringAttribute);
-            free(currentLine.attributeValue.stringAttribute);
-        }
+            result.materialName = clean_strdup(currentLine.attributeValue.stringAttribute);
         
         free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
@@ -287,12 +275,7 @@ struct PointLight parse_pointLight(unsigned long* nbBracketsOpen)
         currentLine = parse_line(trim);
         
         if (strcmp("name", currentLine.attributeName) == 0)
-        {
-            result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.name, currentLine.attributeValue.stringAttribute);
-            free(currentLine.attributeValue.stringAttribute);
-            
-        }
+            result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
         {
             result.position.x = currentLine.attributeValue.arrayAttribute[0];
@@ -348,11 +331,7 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
         currentLine = parse_line(trim);
         
         if (strcmp("name", currentLine.attributeName) == 0)
-        {
-            result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.name, currentLine.attributeValue.stringAttribute);   
-            free(currentLine.attributeValue.stringAttribute);
-        }
+            result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
         {
             result.position.x = currentLine.attributeValue.arrayAttribute[0];
@@ -416,11 +395,7 @@ struct TriangleMesh parse_triangle(unsigned long* nbBracketsOpen)
         currentLine = parse_line(trim);
         
         if (strcmp("name", currentLine.attributeName) == 0)
-        {
-            result.name = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(result.name, currentLine.attributeValue.stringAttribute);
-            free(currentLine.attributeValue.stringAttribute);
-        }
+            result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("number_of_vertexes", currentLine.attributeName) == 0)
             result.nbVertexes = currentLine.attributeValue.longAttribute;
         else if (strcmp("number_of_faces", currentLine.attributeName) == 0)
@@ -724,4 +699,12 @@ void freeStructs(struct Material *outMaterial, long nbMaterials, struct Sphere *
         }
         free(outTriangle);
     }
+}
+
+char* clean_strdup(char* source) // Inline or not inline ?
+{
+    char* temp;
+    temp = strdup(source);
+    free(source); // Good clean dog.
+    return temp;
 }
