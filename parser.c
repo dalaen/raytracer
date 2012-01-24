@@ -490,7 +490,7 @@ struct Vertex parse_vertex(unsigned long* nbBracketsOpen)
 }
 
 
-void parse_render(char* sceneFile, struct Camera** outCamera, const long* nbCameras, struct OutputInfo* output)
+void parse_render(char** sceneFil, struct Camera** outCamera, const long* nbCameras, struct OutputInfo* output)
 {
     char buffer[MAX_LINE_SIZE];
     char* trim;
@@ -526,9 +526,11 @@ void parse_render(char* sceneFile, struct Camera** outCamera, const long* nbCame
         
         if (strcmp("scene_file", currentLine.attributeName) == 0)
         {
-            sceneFile = malloc(sizeof(char) * strlen(currentLine.attributeValue.stringAttribute) + 1);
-            strcpy(sceneFile, currentLine.attributeValue.stringAttribute);
+            printf("%s\n", currentLine.attributeValue.stringAttribute);
+            *sceneFil = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
+            strcpy(*sceneFil, currentLine.attributeValue.stringAttribute);
             free(currentLine.attributeValue.stringAttribute);
+            printf("%s\n", *sceneFil);
         }
         else if (strcmp("camera", currentLine.attributeName) == 0)
         {

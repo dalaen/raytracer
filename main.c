@@ -107,7 +107,7 @@ int main(int argc, char** argv)
             return(EXIT_FAILURE);
         }
         parse_render(&sceneFile, &cameras, &nbCameras, &output);
-        printf("\noutput_size.height = %ld\n", output.height);
+        printf("\noutput_size.height = %s\n", sceneFile);
     }
     
     /*
