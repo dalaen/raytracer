@@ -46,9 +46,7 @@ int main(int argc, char** argv)
     long y;
     long distanceIntersection;
     
-    blackColor.red = 0;
-    blackColor.green = 0;
-    blackColor.blue = 0;
+    blackColor = init_color(0, 0, 0);
     /*
     myImage.width = IMAGE_WIDTH;
     myImage.height = IMAGE_HEIGHT;

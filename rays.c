@@ -16,6 +16,17 @@ struct LightRay set_ray(long originX, long originY, long originZ, long direction
     return newRay;
 }
 
+struct Pixel init_color(unsigned char red, unsigned char blue, unsigned char green)
+{
+    struct Pixel result;
+    
+    result.red = red;
+    result.blue = blue;
+    result.green = green;
+    
+    return result;
+}
+
 double intersection_sphere(struct Sphere sphere, struct LightRay ray)
 {
     double x;
