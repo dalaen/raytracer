@@ -22,6 +22,7 @@ struct PointLight parse_pointLight(unsigned long*);
 struct Camera parse_camera(unsigned long*);
 struct TriangleMesh parse_triangle(unsigned long*);
 struct Vertex parse_vertex(unsigned long*);
+void parse_render(char*, struct Camera**, const long*, struct OutputInfo*);
 struct LineData parse_line(char*);
 enum Operation getOperation(char*);
 unsigned long count_indent(const char*);

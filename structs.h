@@ -67,6 +67,7 @@ extern "C" {
         struct Point3D position; // x,y,z
         struct Point3D lookAt; // x,y,z
         char* projectionType;
+        int inUse;
     };
 
     struct LightRay {
@@ -117,6 +118,18 @@ extern "C" {
         char* attributeName;
         enum Operation operation;
         union AttributeValue attributeValue;
+    };
+    
+    enum FileFormat
+    {
+        PPM, BMP
+    };
+    
+    struct OutputInfo
+    {
+        enum FileFormat format;
+        long width;
+        long height;
     };
 
 #ifdef	__cplusplus

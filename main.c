@@ -33,6 +33,8 @@ int main(int argc, char** argv)
     struct TriangleMesh* triangles = NULL;
     long nbTriangles = 0;
     
+    struct OutputInfo output;
+    char* sceneFile = NULL;
     
     char* sceneFilename = NULL;
     char* renderFilename = NULL;
@@ -80,7 +82,6 @@ int main(int argc, char** argv)
 
     while (--i >= 0)
     {
-        printf("%s", argv[2]);
         if (strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "conf") == 0) // If file's extension is "conf"
         {
             *whichFilename[i] = malloc(sizeof(char) * strlen(argv[getArrayLocationByI(i)]) + 1);
@@ -88,14 +89,27 @@ int main(int argc, char** argv)
         }
     }
     
-    if (freopen(sceneFilename, "r", stdin) == NULL)
+    if (sceneFilename != NULL)
     {
-        printf("Erreur lors de l'import du fichier : %s", sceneFilename);
-        return(EXIT_FAILURE);
+        if (freopen(sceneFilename, "r", stdin) == NULL)
+        {
+            printf("Erreur lors de l'import du fichier : %s", sceneFilename);
+            return(EXIT_FAILURE);
+        }
+        parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &pointsLight, &nbPointsLight, &cameras, &nbCameras, &triangles, &nbTriangles);
+        printf("\nsphere.position.x = %ld\n", triangles[0].vertexes[1].position.y);
+    }
+    if (renderFilename != NULL)
+    {
+        if (freopen(renderFilename, "r", stdin) == NULL)
+        {
+            printf("Erreur lors de l'import du fichier : %s", renderFilename);
+            return(EXIT_FAILURE);
+        }
+        parse_render(&sceneFile, &cameras, &nbCameras, &output);
+        printf("\noutput_size.height = %ld\n", output.height);
     }
     
-    parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &pointsLight, &nbPointsLight, &cameras, &nbCameras, &triangles, &nbTriangles);
-    printf("\nsphere.position.x = %ld\n", triangles[0].vertexes[1].position.y);
     /*
     // Création scène
     myScene.spheres[0] = init_sphere(233, 290, 200, 100, MAX_COLOR, 0, 0);
@@ -133,6 +147,7 @@ int main(int argc, char** argv)
     
     free(renderFilename);
     free(sceneFilename);
+    free(sceneFile);
     freeStructs(materials, nbMaterials, spheres, nbSpheres, pointsLight, nbPointsLight, cameras, nbCameras, triangles, nbTriangles);
     
     return (EXIT_SUCCESS);

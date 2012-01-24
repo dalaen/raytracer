@@ -34,7 +34,7 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
     while (readLine() != NULL)
     {
         trim = buffer;
-        trim(trim);
+        trim = trim(trim);
 
         // First the scene
         if (strstr(trim, "scene") != NULL)
@@ -490,6 +490,82 @@ struct Vertex parse_vertex(unsigned long* nbBracketsOpen)
 }
 
 
+void parse_render(char* sceneFile, struct Camera** outCamera, const long* nbCameras, struct OutputInfo* output)
+{
+    char buffer[MAX_LINE_SIZE];
+    char* trim;
+    char* temp = NULL;
+    struct LineData currentLine;
+    long i;
+    int cameraFound = 0;
+    unsigned long nbBracketsOpen = 0;
+    
+    while (readLine() != NULL)
+    {
+        trim = buffer;
+        trim = trim(trim);
+        
+        // Function is called when "scene" text is matched
+        // Jumping over {
+        if (*trim == '{')
+        {
+            nbBracketsOpen++;
+            continue; // Next line
+        }
+        else if (*trim == '}')
+        {
+            nbBracketsOpen--;
+            continue; // Next line
+        }
+        if (is_comment(trim)) // Jump over comments
+            continue;
+        if (strlen(trim) == 0) // Blank line? Jump!
+            continue;
+        
+        currentLine = parse_line(trim);
+        
+        if (strcmp("scene_file", currentLine.attributeName) == 0)
+        {
+            sceneFile = malloc(sizeof(char) * strlen(currentLine.attributeValue.stringAttribute) + 1);
+            strcpy(sceneFile, currentLine.attributeValue.stringAttribute);
+            free(currentLine.attributeValue.stringAttribute);
+        }
+        else if (strcmp("camera", currentLine.attributeName) == 0)
+        {
+            for (i = 0 ; i < *nbCameras ; i++)
+            {
+                if (strcmp(currentLine.attributeValue.stringAttribute, outCamera[i]->name) == 0)
+                {
+                    outCamera[i]->inUse = 1;
+                    cameraFound = 1;
+                }
+            }
+            free(currentLine.attributeValue.stringAttribute);
+        }
+        else if (strcmp("output_format", currentLine.attributeName) == 0)
+        {
+            if (strcmp("PPM", currentLine.attributeValue.stringAttribute) == 0)
+                output->format = PPM;
+            else if (strcmp("BMP", currentLine.attributeValue.stringAttribute))
+                output->format = BMP;
+            else // default output format
+                output->format = PPM;
+            free(currentLine.attributeValue.stringAttribute);
+        }
+        else if (strcmp("output_size", currentLine.attributeName) == 0)
+        {
+            output->width = currentLine.attributeValue.arrayAttribute[0];
+            output->height = currentLine.attributeValue.arrayAttribute[1];
+        }
+            
+        free(currentLine.attributeName);
+    }
+    if (!cameraFound)
+        printf("\nNo camera was specified in the render configuration file... Cannot process to any rendering");
+}
+
+
+
 
 struct LineData parse_line(char* buffer)
 {
@@ -533,8 +609,8 @@ struct LineData parse_line(char* buffer)
         temp = result.attributeValue.longAttribute;
         result.attributeValue.arrayAttribute[0] = temp;
         result.attributeValue.arrayAttribute[1] = atol(argument);
-        nextArgument();
-        result.attributeValue.arrayAttribute[2] = atol(argument);
+        if (nextArgument() != NULL)
+            result.attributeValue.arrayAttribute[2] = atol(argument);
     }
     
     return result;
