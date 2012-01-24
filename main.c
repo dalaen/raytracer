@@ -108,41 +108,8 @@ int main(int argc, char** argv)
         parse_render(&sceneFile, &cameras, &nbCameras, &output);
     }
     
-    // Création scène
-/*
-    myScene.spheres[0] = init_sphere(233, 290, 200, 100, MAX_COLOR, 0, 0);
-    myScene.spheres[1] = init_sphere(407, 290, 200, 100, 0, MAX_COLOR, 0);
-    myScene.spheres[2] = init_sphere(320, 140, 200, 100, 0, 0, MAX_COLOR);
-*/
-    
     // IMMA CHARGIN MAH LAZER
-    for (y = 0 ; y < output.height ; y++)
-    {
-        for (x = 0 ; x < output.width ; x++)
-        {
-            // Initialisation du rayon pour chaque pixel
-            ray = set_ray(x, y, 0, 0, 0, 1);
-            // Quel objet est intersecté par ce rayon
-            distance.distance = IMAGE_DEPTH;
-            distance.whatSphere = 0;
-            for (i = 0 ; i < nbSpheres ; i++)
-            {
-                if ((distanceIntersection = intersection_sphere(spheres[i], ray)) != 0.0) // Il y a intersection
-                {
-                    if (distance.distance > distanceIntersection)
-                    {
-                        distance.distance = distanceIntersection;
-                        distance.whatSphere = i;
-                    }
-                }
-                if (distance.distance != IMAGE_DEPTH)
-                {
-                    materialId = findMaterialIdByName(materials, spheres[distance.whatSphere].materialName, nbMaterials);
-                    setPixel(&output, x, y, materials[materialId].diffuseColor.red, materials[materialId].diffuseColor.green, materials[materialId].diffuseColor.blue);
-                }
-            }
-        }
-    }
+    buildImage(&output, materials, nbMaterials, spheres, nbSpheres);
     
     
     makeOutput(&output); // Next step : directly in the file ?

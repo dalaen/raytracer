@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
     void setPixel(struct OutputInfo *imageppm, long, long, unsigned char, unsigned char, unsigned char);
-//    void buildImage(struct Image *imageppm, struct Scene, struct Rays rays[][IMAGE_WIDTH]);
+    void buildImage(struct OutputInfo*, struct Material*, const long, struct Sphere*, const long);
     void fillColor(struct OutputInfo *imageppm, struct Pixel);
     void makeOutput(struct OutputInfo *imageppm);
 

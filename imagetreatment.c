@@ -19,22 +19,45 @@ void setPixel(struct OutputInfo *imageppm, long x, long y, unsigned char red, un
     imageppm->image[y][x].red = 255 * red;
 }
 
-/*void buildImage(struct Image *imageppm, struct Scene myScene, struct LightRay rays[][IMAGE_WIDTH])
+// IMMA CHARGIN MAH LAZER
+void buildImage(struct OutputInfo* output, struct Material* materials, const long nbMaterials, struct Sphere* spheres, const long nbSpheres)
 {
+    struct Distance distance;
+    struct LightRay ray;
+    long distanceIntersection;
+    long materialId;
+    long i;
     long x;
     long y;
-    long spheresToDo;
     
-    for (spheresToDo = myScene.nbSphere ; spheresToDo >= 0 ; spheresToDo--)
+    for (y = 0 ; y < output->height ; y++)
     {
-        for (y = 0 ; y < myScene.height ; y++)
-            for (x = 0 ; x < myScene.width ; x++)
+        for (x = 0 ; x < output->width ; x++)
+        {
+            // Initialisation du rayon pour chaque pixel
+            ray = set_ray(x, y, 0, 0, 0, 1);
+            // Quel objet est intersecté par ce rayon
+            distance.distance = IMAGE_DEPTH;
+            distance.whatSphere = 0;
+            for (i = 0 ; i < nbSpheres ; i++)
             {
-                if (intersecting(rays[y][x], myScene))
-                    ;
+                if ((distanceIntersection = intersection_sphere(spheres[i], ray)) != 0.0) // Il y a intersection
+                {
+                    if (distance.distance > distanceIntersection)
+                    {
+                        distance.distance = distanceIntersection;
+                        distance.whatSphere = i;
+                    }
+                }
+                if (distance.distance != IMAGE_DEPTH)
+                {
+                    materialId = findMaterialIdByName(materials, spheres[distance.whatSphere].materialName, nbMaterials);
+                    setPixel(output, x, y, materials[materialId].diffuseColor.red, materials[materialId].diffuseColor.green, materials[materialId].diffuseColor.blue);
+                }
             }
+        }
     }
-}*/
+}
 
 void fillColor(struct OutputInfo *imageppm, struct Pixel color)
 {
