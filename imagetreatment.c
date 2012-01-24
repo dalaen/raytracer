@@ -12,11 +12,11 @@
 #include "imagetreatment.h"
 #include "rays.h"
 
-void setPixel(struct OutputInfo *imageppm, long x, long y, unsigned char red, unsigned char green, unsigned char blue)
+void setPixel(struct OutputInfo *output, long x, long y, unsigned char red, unsigned char green, unsigned char blue)
 {
-    imageppm->image[y][x].blue = 255 * blue;
-    imageppm->image[y][x].green = 255 * green;
-    imageppm->image[y][x].red = 255 * red;
+    output->image[y][x].blue = 255 * blue;
+    output->image[y][x].green = 255 * green;
+    output->image[y][x].red = 255 * red;
 }
 
 // IMMA CHARGIN MAH LAZER
@@ -59,38 +59,42 @@ void buildImage(struct OutputInfo* output, struct Material* materials, const lon
     }
 }
 
-void fillColor(struct OutputInfo *imageppm, struct Pixel color)
+void fillColor(struct OutputInfo *output, struct Pixel color)
 {
     int x;
     int y;
     
-    for (y = 0 ; y < imageppm->height ; y++)
+    for (y = 0 ; y < output->height ; y++)
     {
-        for (x = 0 ; x < imageppm->width ; x++)
+        for (x = 0 ; x < output->width ; x++)
         {
-            setPixel(imageppm, x, y, color.red, color.green, color.blue);
+            setPixel(output, x, y, color.red, color.green, color.blue);
         }
     }
 }
 
-void makeOutput(struct OutputInfo *imageppm)
+void makeOutput(struct OutputInfo output)
 {
     int x;
     int y;
-    printf("P3");
-    printf("\n");
-    printf("%ld %ld", imageppm->width, imageppm->height);
-    printf("\n");
-    printf("%d", MAX_COLOR);
-    printf("\n");
-    // Affichage des pixels
-    for (y = 0 ; y < imageppm->height ; y++)
+    
+    if (output.format == PPM)
     {
-        for (x = 0 ; x < imageppm->width ; x++)
-        {
-            printf("%d %d %d\n", imageppm->image[y][x].red, imageppm->image[y][x].green, imageppm->image[y][x].blue);
-        }
+        printf("P3");
         printf("\n");
+        printf("%ld %ld", output.width, output.height);
+        printf("\n");
+        printf("%d", MAX_COLOR);
+        printf("\n");
+        // Affichage des pixels
+        for (y = 0 ; y < output.height ; y++)
+        {
+            for (x = 0 ; x < output.width ; x++)
+            {
+                printf("%d %d %d\n", output.image[y][x].red, output.image[y][x].green, output.image[y][x].blue);
+            }
+            printf("\n");
+        }
     }
     
 }

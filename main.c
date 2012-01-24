@@ -56,7 +56,10 @@ int main(int argc, char** argv)
     fillColor(&myImage, blackColor); // Remplir l'image de noir
     //*/
     
-    // CLI management
+    // Should be moved to another file?
+    /*************************************************************/
+    /********************* CLI MANAGEMENT ************************/
+    /*************************************************************/
     if (argc >= 3) // First argument
     {
         if (strcmp(argv[1], "-s") == 0) // Scene file following
@@ -88,6 +91,9 @@ int main(int argc, char** argv)
             strcpy(*whichFilename[i], argv[getArrayLocationByI(i)]);
         }
     }
+    /*************************************************************/
+    /****************** END CLI MANAGEMENT ***********************/
+    /*************************************************************/
     
     if (sceneFilename != NULL)
     {
@@ -111,8 +117,7 @@ int main(int argc, char** argv)
     // IMMA CHARGIN MAH LAZER
     buildImage(&output, materials, nbMaterials, spheres, nbSpheres);
     
-    
-    makeOutput(&output); // Next step : directly in the file ?
+    makeOutput(output); // Next step : directly in the file ?
     
     free(renderFilename);
     free(sceneFilename);
