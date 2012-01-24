@@ -39,12 +39,14 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
         // First the scene
         if (strstr(trim, "scene") != NULL)
             *outScene = parse_scene(&nbBracketsOpen);
+        
+        // All those giant lines could maybe be reduced in an inline function...
         if (strstr(trim, "material") != NULL)
         {
             if (*nbMaterials == 0)
                 *outMaterial = (struct Material*) malloc(sizeof(struct Material));
             else if (*nbMaterials > 0)
-                *outMaterial = (struct Material*) realloc(outMaterial, sizeof(struct Material) * (*nbMaterials + 1));
+                *outMaterial = (struct Material*) realloc(*outMaterial, sizeof(struct Material) * (*nbMaterials + 1));
             (*outMaterial)[(*nbMaterials)++] = parse_material(&nbBracketsOpen);
         }
         if (strstr(trim, "sphere") != NULL)
@@ -52,7 +54,7 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
             if (*nbSpheres == 0)
                 *outSphere = (struct Sphere*) malloc(sizeof(struct Sphere));
             else if (*nbSpheres > 0)
-                *outSphere = (struct Sphere*) realloc(outSphere, sizeof(struct Sphere) * (*nbSpheres + 1));
+                *outSphere = (struct Sphere*) realloc(*outSphere, sizeof(struct Sphere) * (*nbSpheres + 1));
             (*outSphere)[(*nbSpheres)++] = parse_sphere(&nbBracketsOpen);
         }
         if (strstr(trim, "point_light") != NULL)
@@ -60,7 +62,7 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
             if (*nbPointsLight == 0)
                 *outPointLight = (struct PointLight*) malloc(sizeof(struct PointLight));
             else if (*nbPointsLight > 0)
-                *outPointLight = (struct PointLight*) realloc(outPointLight, sizeof(struct PointLight) * (*nbPointsLight + 1));
+                *outPointLight = (struct PointLight*) realloc(*outPointLight, sizeof(struct PointLight) * (*nbPointsLight + 1));
             (*outPointLight)[(*nbPointsLight)++] = parse_pointLight(&nbBracketsOpen);
         }
         if (strstr(trim, "camera") != NULL)
@@ -68,7 +70,7 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
             if (*nbCameras == 0)
                 *outCamera = (struct Camera*) malloc(sizeof(struct Camera));
             else if (*nbCameras > 0)
-                *outCamera = (struct Camera*) realloc(outCamera, sizeof(struct Camera) * (*nbCameras + 1));
+                *outCamera = (struct Camera*) realloc(*outCamera, sizeof(struct Camera) * (*nbCameras + 1));
             (*outCamera)[(*nbCameras)++] = parse_camera(&nbBracketsOpen);
         }
         if (strstr(trim, "triangle_mesh") != NULL)
@@ -76,7 +78,7 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
             if (*nbTriangles == 0)
                 *outTriangle = (struct TriangleMesh*) malloc(sizeof(struct TriangleMesh));
             else if (*nbTriangles > 0)
-                *outTriangle = (struct TriangleMesh*) realloc(outTriangle, sizeof(struct TriangleMesh) * (*nbTriangles + 1));
+                *outTriangle = (struct TriangleMesh*) realloc(*outTriangle, sizeof(struct TriangleMesh) * (*nbTriangles + 1));
             (*outTriangle)[(*nbTriangles)++] = parse_triangle(&nbBracketsOpen);
         }
     }
@@ -172,8 +174,9 @@ struct Material parse_material(unsigned long* nbBracketsOpen)
             result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("diffuse_color", currentLine.attributeName) == 0)
         {
-            for (i = 0 ; i < 3 ; i++)
-                result.diffuseColor[i] = currentLine.attributeValue.arrayAttribute[i];
+            result.diffuseColor.red = currentLine.attributeValue.arrayAttribute[0];
+            result.diffuseColor.green = currentLine.attributeValue.arrayAttribute[1];
+            result.diffuseColor.blue = currentLine.attributeValue.arrayAttribute[2];
         }
         else if (strcmp("reflection_coefficient", currentLine.attributeName) == 0)
             result.reflectionCoefficient = currentLine.attributeValue.floatAttribute;
@@ -475,13 +478,7 @@ void parse_render(char** sceneFil, struct Camera** outCamera, const long* nbCame
         currentLine = parse_line(trim);
         
         if (strcmp("scene_file", currentLine.attributeName) == 0)
-        {
-            printf("%s\n", currentLine.attributeValue.stringAttribute);
-            *sceneFil = malloc(sizeof(char) * (strlen(currentLine.attributeValue.stringAttribute) + 1));
-            strcpy(*sceneFil, currentLine.attributeValue.stringAttribute);
-            free(currentLine.attributeValue.stringAttribute);
-            printf("%s\n", *sceneFil);
-        }
+            *sceneFil = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("camera", currentLine.attributeName) == 0)
         {
             for (i = 0 ; i < *nbCameras ; i++)

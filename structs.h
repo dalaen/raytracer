@@ -12,7 +12,6 @@
 extern "C" {
 #endif
 
-#define NB_SPHERE 3             // Number of spheres in the scene
 #define IMAGE_WIDTH 640         // Image's width
 #define IMAGE_HEIGHT 480        // Image's height
 #define IMAGE_DEPTH 500         // Image's depth (3D)
@@ -40,7 +39,6 @@ extern "C" {
     };
     
     struct Scene {
-        struct Sphere spheres[NB_SPHERE];
         unsigned long nbSphere;
         unsigned long nbMaterial;
         unsigned long nbTriangleMesh;
@@ -52,7 +50,7 @@ extern "C" {
     
     struct Material {
         char* name;
-        unsigned int diffuseColor[3]; // R G B
+        struct Pixel diffuseColor; // R G B
         float reflectionCoefficient;
     };
     
@@ -87,12 +85,6 @@ extern "C" {
         struct Point3D position;
     };
     
-    struct Image
-    {
-        long width;
-        long height;
-        struct Pixel image[IMAGE_HEIGHT][IMAGE_WIDTH];
-    };
     
     struct Distance
     {
@@ -130,6 +122,7 @@ extern "C" {
         enum FileFormat format;
         long width;
         long height;
+        struct Pixel image[IMAGE_HEIGHT][IMAGE_WIDTH];
     };
 
 #ifdef	__cplusplus

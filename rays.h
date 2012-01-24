@@ -15,6 +15,7 @@ extern "C" {
 struct LightRay set_ray(long, long, long, long, long, long);
 struct Pixel init_color(unsigned char, unsigned char, unsigned char);
 double intersection_sphere(struct Sphere, struct LightRay);
+long findMaterialIdByName(struct Material*, char*, const long);
 
 
 #ifdef	__cplusplus

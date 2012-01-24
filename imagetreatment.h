@@ -12,10 +12,10 @@
 extern "C" {
 #endif
 
-    void setPixel(struct Image *imageppm, long, long, unsigned char, unsigned char, unsigned char);
+    void setPixel(struct OutputInfo *imageppm, long, long, unsigned char, unsigned char, unsigned char);
 //    void buildImage(struct Image *imageppm, struct Scene, struct Rays rays[][IMAGE_WIDTH]);
-    void fillColor(struct Image *imageppm, struct Pixel);
-    void makeOutput(struct Image *imageppm);
+    void fillColor(struct OutputInfo *imageppm, struct Pixel);
+    void makeOutput(struct OutputInfo *imageppm);
 
 
 #ifdef	__cplusplus

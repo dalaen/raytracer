@@ -58,3 +58,13 @@ double intersection_sphere(struct Sphere sphere, struct LightRay ray)
     return t;
 
 }
+
+long findMaterialIdByName(struct Material* haystack, char* name, const long nbMaterials)
+{
+    long i;
+    
+    for (i = 0 ; i < nbMaterials ; i++)
+        if (strcmp(haystack[i].name, name) == 0)
+            return i;
+    return -1;
+}

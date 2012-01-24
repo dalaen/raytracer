@@ -12,11 +12,11 @@
 #include "imagetreatment.h"
 #include "rays.h"
 
-void setPixel(struct Image *imageppm, long x, long y, unsigned char red, unsigned char green, unsigned char blue)
+void setPixel(struct OutputInfo *imageppm, long x, long y, unsigned char red, unsigned char green, unsigned char blue)
 {
-    imageppm->image[y][x].blue = blue;
-    imageppm->image[y][x].green = green;
-    imageppm->image[y][x].red = red;
+    imageppm->image[y][x].blue = 255 * blue;
+    imageppm->image[y][x].green = 255 * green;
+    imageppm->image[y][x].red = 255 * red;
 }
 
 /*void buildImage(struct Image *imageppm, struct Scene myScene, struct LightRay rays[][IMAGE_WIDTH])
@@ -36,7 +36,7 @@ void setPixel(struct Image *imageppm, long x, long y, unsigned char red, unsigne
     }
 }*/
 
-void fillColor(struct Image *imageppm, struct Pixel color)
+void fillColor(struct OutputInfo *imageppm, struct Pixel color)
 {
     int x;
     int y;
@@ -50,7 +50,7 @@ void fillColor(struct Image *imageppm, struct Pixel color)
     }
 }
 
-void makeOutput(struct Image *imageppm)
+void makeOutput(struct OutputInfo *imageppm)
 {
     int x;
     int y;

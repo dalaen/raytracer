@@ -20,7 +20,6 @@
  */
 int main(int argc, char** argv)
 {
-    struct Image myImage;
     struct Scene myScene;
     struct Material* materials = NULL;
     long nbMaterials = 0;
@@ -47,6 +46,7 @@ int main(int argc, char** argv)
     long x;
     long y;
     long distanceIntersection;
+    long materialId;
     
     blackColor = init_color(0, 0, 0);
     /*
@@ -97,7 +97,6 @@ int main(int argc, char** argv)
             return(EXIT_FAILURE);
         }
         parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &pointsLight, &nbPointsLight, &cameras, &nbCameras, &triangles, &nbTriangles);
-        printf("\nsphere.position.x = %ld\n", triangles[0].vertexes[1].position.y);
     }
     if (renderFilename != NULL)
     {
@@ -107,27 +106,28 @@ int main(int argc, char** argv)
             return(EXIT_FAILURE);
         }
         parse_render(&sceneFile, &cameras, &nbCameras, &output);
-        printf("\noutput_size.height = %s\n", sceneFile);
     }
     
-    /*
     // Création scène
+/*
     myScene.spheres[0] = init_sphere(233, 290, 200, 100, MAX_COLOR, 0, 0);
     myScene.spheres[1] = init_sphere(407, 290, 200, 100, 0, MAX_COLOR, 0);
     myScene.spheres[2] = init_sphere(320, 140, 200, 100, 0, 0, MAX_COLOR);
+*/
     
-    for (y = 0 ; y < myImage.height ; y++)
+    // IMMA CHARGIN MAH LAZER
+    for (y = 0 ; y < output.height ; y++)
     {
-        for (x = 0 ; x < myImage.width ; x++)
+        for (x = 0 ; x < output.width ; x++)
         {
             // Initialisation du rayon pour chaque pixel
             ray = set_ray(x, y, 0, 0, 0, 1);
             // Quel objet est intersecté par ce rayon
             distance.distance = IMAGE_DEPTH;
             distance.whatSphere = 0;
-            for (i = 0 ; i < NB_SPHERE ; i++)
+            for (i = 0 ; i < nbSpheres ; i++)
             {
-                if ((distanceIntersection = intersection_sphere(myScene.spheres[i], ray)) != 0.0) // Il y a intersection
+                if ((distanceIntersection = intersection_sphere(spheres[i], ray)) != 0.0) // Il y a intersection
                 {
                     if (distance.distance > distanceIntersection)
                     {
@@ -136,14 +136,16 @@ int main(int argc, char** argv)
                     }
                 }
                 if (distance.distance != IMAGE_DEPTH)
-                    setPixel(&myImage, x, y, myScene.spheres[distance.whatSphere].color.red, myScene.spheres[distance.whatSphere].color.green, myScene.spheres[distance.whatSphere].color.blue);
+                {
+                    materialId = findMaterialIdByName(materials, spheres[distance.whatSphere].materialName, nbMaterials);
+                    setPixel(&output, x, y, materials[materialId].diffuseColor.red, materials[materialId].diffuseColor.green, materials[materialId].diffuseColor.blue);
+                }
             }
         }
     }
     
     
-    makeOutput(&myImage);
-    //*/
+    makeOutput(&output); // Next step : directly in the file ?
     
     free(renderFilename);
     free(sceneFilename);
