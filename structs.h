@@ -60,11 +60,16 @@ extern "C" {
         struct Pixel colorIntensity;
     };
     
+    enum ProjectionType
+    {
+        ORTHOGRAPHIC
+    };
+    
     struct Camera {
         char* name;
         struct Point3D position; // x,y,z
         struct Point3D lookAt; // x,y,z
-        char* projectionType;
+        enum ProjectionType projectionType;
         int inUse;
     };
 

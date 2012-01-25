@@ -11,7 +11,7 @@
 #define initMaterial(which) which.name = NULL
 #define initSphere(which) which.name = NULL; which.materialName = NULL
 #define initPointLight(which) which.name = NULL
-#define initCamera(which) which.name = NULL; which.projectionType = NULL
+#define initCamera(which) which.name = NULL
 #define initTriangleMesh(which) which.name = NULL; which.vertexes = NULL
 #define initFace(which, by) which.type = by
 
@@ -330,7 +330,11 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
         else if (strcmp("look_at", currentLine.attributeName) == 0)
             result.lookAt = array2position(currentLine.attributeValue.arrayAttribute);
         else if (strcmp("projection_type", currentLine.attributeName) == 0)
-            result.projectionType = clean_strdup(currentLine.attributeValue.stringAttribute);
+        {
+            if (strcmp(currentLine.attributeValue.stringAttribute, "orthographic") == 0)
+                result.projectionType = ORTHOGRAPHIC;
+            free(currentLine.attributeValue.stringAttribute);
+        }
         
         free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
@@ -671,7 +675,6 @@ void freeStructs(struct Material *outMaterial, long nbMaterials, struct Sphere *
         for (i = 0 ; i < nbCameras ; i++)
         {
             free(outCamera[i].name);
-            free(outCamera[i].projectionType);
         }
         free(outCamera);
     }
