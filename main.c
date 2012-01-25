@@ -64,7 +64,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            printf("You must use options associated with a filename!\n");
+            fprintf(stderr, "You must use options associated with a filename!\n");
             return(EXIT_FAILURE);
         }
     }
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
         else if (!isConf[i] && (strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "ppm") == 0 || strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "bmp") == 0))
             *whichFilename[i] = strdup(argv[getArrayLocationByI(i)]);
         else
-            printf("%s file has an incorrect extension. Allowed extensions: .conf, .ppm, .bmp\n", argv[getArrayLocationByI(i)]);
+            fprintf(stderr, "%s file has an incorrect extension. Allowed extensions: .conf, .ppm, .bmp\n", argv[getArrayLocationByI(i)]);
     }
     /*************************************************************/
     /****************** END CLI MANAGEMENT ***********************/
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     {
         if (freopen(sceneFilename, "r", stdin) == NULL)
         {
-            printf("Erreur lors de l'import du fichier : %s", sceneFilename);
+            fprintf(stderr, "Cannot open following file: %s", sceneFilename);
             return(EXIT_FAILURE);
         }
         parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &lightPoints, &nbLightPoints, &cameras, &nbCameras, &triangles, &nbTriangles);
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
     {
         if (freopen(renderFilename, "r", stdin) == NULL)
         {
-            printf("Erreur lors de l'import du fichier : %s", renderFilename);
+            fprintf(stderr, "Cannot open following file: %s", renderFilename);
             return(EXIT_FAILURE);
         }
         parse_render(&sceneFile, &cameras, &nbCameras, &output);

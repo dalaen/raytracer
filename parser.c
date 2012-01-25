@@ -511,7 +511,7 @@ void parse_render(char** sceneFil, struct Camera** outCamera, const long* nbCame
         free(currentLine.attributeName);
     }
     if (!cameraFound)
-        printf("\nNo camera was specified in the render configuration file... Cannot process to any rendering");
+        fprintf(stderr, "\nNo camera was specified in the render configuration file... Cannot process to any rendering");
 }
 
 
