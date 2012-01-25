@@ -5,7 +5,7 @@
 #include "spheres.h"
 #include "rays.h"
 
-struct LightRay set_ray(long originX, long originY, long originZ, long directionX, long directionY, long directionZ)
+struct LightRay set_ray(float originX, float originY, float originZ, float directionX, float directionY, float directionZ)
 {
     struct LightRay newRay;
     

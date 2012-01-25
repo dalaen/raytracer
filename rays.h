@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-struct LightRay set_ray(long, long, long, long, long, long);
+struct LightRay set_ray(float, float, float, float, float, float);
 struct Pixel init_color(unsigned char, unsigned char, unsigned char);
 long findMaterialIdByName(const struct Material*, char*, const long);
 inline float dotP3D(struct Point3D, struct Point3D);
