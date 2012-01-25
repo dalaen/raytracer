@@ -92,9 +92,9 @@ int main(int argc, char** argv)
         parse_render(&sceneFile, &cameras, &nbCameras, &output);
     }
     
-    //makeOutput(output); // Next step : directly in the file ?
+    makeOutput(output); // Next step : directly in the file ?
     // IMMA CHARGIN MAH LAZER
-    //buildImage(output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints);
+    buildImage(output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints);
     
     free(renderFilename);
     free(sceneFilename);
