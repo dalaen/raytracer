@@ -15,9 +15,6 @@
 #include "parser.h"
 #define getArrayLocationByI(i) 2*i+2
 
-/*
- * 
- */
 int main(int argc, char** argv)
 {
     struct Scene myScene;
@@ -25,30 +22,21 @@ int main(int argc, char** argv)
     long nbMaterials = 0;
     struct Sphere* spheres = NULL;
     long nbSpheres = 0;
-    struct PointLight* pointsLight = NULL;
-    long nbPointsLight = 0;
+    struct LightPoint* lightPoints = NULL;
+    long nbLightPoints = 0;
     struct Camera* cameras = NULL;
     long nbCameras = 0;
     struct TriangleMesh* triangles = NULL;
     long nbTriangles = 0;
-    
+
     struct OutputInfo output;
     char* sceneFile = NULL;
     
     char* sceneFilename = NULL;
     char* renderFilename = NULL;
     char** whichFilename[2] = {NULL};
-    struct LightRay ray;
-    struct Pixel blackColor;
-    struct Distance distance;
-    long i = 0;
-    long ok;                    // Determines if it's ok to continue
-    long x;
-    long y;
-    long distanceIntersection;
-    long materialId;
     
-    blackColor = init_color(0, 0, 0);
+    long i = 0;
     /*
     myImage.width = IMAGE_WIDTH;
     myImage.height = IMAGE_HEIGHT;
@@ -102,7 +90,7 @@ int main(int argc, char** argv)
             printf("Erreur lors de l'import du fichier : %s", sceneFilename);
             return(EXIT_FAILURE);
         }
-        parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &pointsLight, &nbPointsLight, &cameras, &nbCameras, &triangles, &nbTriangles);
+        parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &lightPoints, &nbLightPoints, &cameras, &nbCameras, &triangles, &nbTriangles);
     }
     if (renderFilename != NULL)
     {
@@ -114,15 +102,14 @@ int main(int argc, char** argv)
         parse_render(&sceneFile, &cameras, &nbCameras, &output);
     }
     
-    // IMMA CHARGIN MAH LAZER
-    buildImage(&output, materials, nbMaterials, spheres, nbSpheres);
-    
     makeOutput(output); // Next step : directly in the file ?
+    // IMMA CHARGIN MAH LAZER
+    buildImage(&output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints);
     
     free(renderFilename);
     free(sceneFilename);
     free(sceneFile);
-    freeStructs(materials, nbMaterials, spheres, nbSpheres, pointsLight, nbPointsLight, cameras, nbCameras, triangles, nbTriangles);
+    freeStructs(materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints, cameras, nbCameras, triangles, nbTriangles);
     
     return (EXIT_SUCCESS);
 }

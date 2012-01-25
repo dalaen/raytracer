@@ -12,49 +12,145 @@
 #include "imagetreatment.h"
 #include "rays.h"
 
-void setPixel(struct OutputInfo *output, long x, long y, unsigned char red, unsigned char green, unsigned char blue)
+void setPixel(struct OutputInfo *output, long x, long y, float red, float green, float blue)
 {
-    output->image[y][x].blue = 255 * blue;
-    output->image[y][x].green = 255 * green;
-    output->image[y][x].red = 255 * red;
+    output->image[y][x].blue = 255.0 * blue;
+    output->image[y][x].green = 255.0 * green;
+    output->image[y][x].red = 255.0 * red;
 }
 
 // IMMA CHARGIN MAH LAZER
-void buildImage(struct OutputInfo* output, struct Material* materials, const long nbMaterials, struct Sphere* spheres, const long nbSpheres)
+void buildImage(struct OutputInfo* output, struct Material* materials, const long nbMaterials, struct Sphere* spheres, const long nbSpheres, struct LightPoint* lightPoints, const long nbLightPoints)
 {
     struct Distance distance;
     struct LightRay ray;
-    long distanceIntersection;
+    struct Point3D intersection;
+    struct Point3D normale;
+    struct LightRay lightray;
+    struct Point3D directionLightPoint;
+    struct Pixel color;
+    const long POV_OFFSET = -2000;          // Constitute the camera depth position
     long materialId;
     long i;
+    long j;
     long x;
     long y;
+    long reflectionDepthLevel;
+    float distanceIntersection;
+    float lambert;
+    float reflectionCoefficient;
+    float norme;
+    float reflect;
+    int inShadow = 0;
     
     for (y = 0 ; y < output->height ; y++)
     {
         for (x = 0 ; x < output->width ; x++)
         {
-            // Initialisation du rayon pour chaque pixel
-            ray = set_ray(x, y, 0, 0, 0, 1);
-            // Quel objet est intersecté par ce rayon
-            distance.distance = IMAGE_DEPTH;
-            distance.whatSphere = 0;
-            for (i = 0 ; i < nbSpheres ; i++)
+            // Initializations...
+            ray = set_ray(x, y, POV_OFFSET, 0, 0, 1);
+            color = init_color(0, 0, 0);
+            reflectionCoefficient = 1.0;
+            reflectionDepthLevel = 0;
+//          O o
+//          /¯________________________
+//          | IMMA FIRIN' MAH LAZOR!!!
+//          \_¯¯¯¯¯
+            do
             {
-                if ((distanceIntersection = intersection_sphere(spheres[i], ray)) != 0.0) // Il y a intersection
+                distance.distance = IMAGE_DEPTH - POV_OFFSET; // Initialize distance to the farest possible, and we're gonna catch the closest this way
+                distance.whatSphere = -1;
+                for (i = 0 ; i < nbSpheres ; i++)
                 {
-                    if (distance.distance > distanceIntersection)
+                    if ((distanceIntersection = intersection_sphere(spheres[i], ray)) != 0.0) // Il y a intersection
                     {
-                        distance.distance = distanceIntersection;
-                        distance.whatSphere = i;
+                        if (distanceIntersection < distance.distance)
+                        {
+                            distance.distance = distanceIntersection;
+                            distance.whatSphere = i;
+                        }
                     }
                 }
-                if (distance.distance != IMAGE_DEPTH)
+                
+                // No spheres cut? No reflections to do then
+                if (distance.whatSphere == -1)
+                    break;
+                
+                // New source of light
+                intersection.x = ray.origin.x + distance.distance * ray.direction.x;
+                intersection.y = ray.origin.y + distance.distance * ray.direction.y;
+                intersection.z = ray.origin.z + distance.distance * ray.direction.z;
+
+                // Compute n normale vector - also can be called "newStart.direction"
+                normale.x = intersection.x - spheres[distance.whatSphere].origin.x;
+                normale.y = intersection.y - spheres[distance.whatSphere].origin.y;
+                normale.z = intersection.z - spheres[distance.whatSphere].origin.z;
+                
+                // Normalize
+                norme = dotP3D(normale, normale);
+                if (norme == 0.0)
+                    break;
+
+                normale.x /= sqrt(norme);
+                normale.y /= sqrt(norme);
+                normale.z /= sqrt(norme);
+                
+                // Find the material of the closest Sphere to the PoV
+                materialId = findMaterialIdByName(materials, spheres[distance.whatSphere].materialName, nbMaterials);
+
+                // Sum of all light points
+                for (j = 0 ; j < nbLightPoints ; j++)
                 {
-                    materialId = findMaterialIdByName(materials, spheres[distance.whatSphere].materialName, nbMaterials);
-                    setPixel(output, x, y, materials[materialId].diffuseColor.red, materials[materialId].diffuseColor.green, materials[materialId].diffuseColor.blue);
+                    directionLightPoint.x = lightPoints[j].position.x - intersection.x;
+                    directionLightPoint.y = lightPoints[j].position.y - intersection.y;
+                    directionLightPoint.z = lightPoints[j].position.z - intersection.z;
+                    if (dotP3D(normale, directionLightPoint) > 0.0)
+                    {
+                        norme = sqrt(dotP3D(directionLightPoint, directionLightPoint));
+                        if (norme > 0.0)
+                        {
+                            lightray.origin.x = intersection.x;
+                            lightray.origin.y = intersection.y;
+                            lightray.origin.z = intersection.z;
+                            lightray.direction.x = (1/norme) * directionLightPoint.x;
+                            lightray.direction.y = (1/norme) * directionLightPoint.y;
+                            lightray.direction.z = (1/norme) * directionLightPoint.z;
+                            inShadow = 0;
+                            // Shadows
+                            for (i = 0 ; i < nbSpheres ; i++)
+                            {
+                                if (intersection_sphere(spheres[i], lightray) != 0.0) // Il y a intersection
+                                {
+                                    inShadow = 1;
+                                    break;
+                                }
+                            }
+                            if (!inShadow)
+                            {
+                                lambert = reflectionCoefficient * dotP3D(lightray.direction, normale);
+                                color.red += lambert * lightPoints[j].colorIntensity.red * materials[materialId].diffuseColor.red;
+                                color.green += lambert * lightPoints[j].colorIntensity.green * materials[materialId].diffuseColor.green;
+                                color.blue += lambert * lightPoints[j].colorIntensity.blue * materials[materialId].diffuseColor.blue;
+                            }
+                        }
+                    }
                 }
-            }
+                
+                reflectionCoefficient *= materials[materialId].reflectionCoefficient;
+
+                reflect = 2.0f * dotP3D(ray.direction, normale);
+                ray.origin.x = intersection.x;
+                ray.origin.y = intersection.y;
+                ray.origin.z = intersection.z;
+                ray.direction.x -= reflect * normale.x;
+                ray.direction.y -= reflect * normale.y;
+                ray.direction.z -= reflect * normale.z;
+
+                reflectionDepthLevel++;
+            } while (reflectionCoefficient > 0.0 && reflectionDepthLevel < 10);
+
+            printf("%d %d %d\n", (unsigned char)min(255.0, 255.0 * color.red), (unsigned char)min(255.0, 255.0 * color.green), (unsigned char)min(255.0, 255.0 * color.blue));
+            //setPixel(output, x, y, min(1.0, red), min(1.0, green), min(1.0, blue));
         }
     }
 }
@@ -75,9 +171,6 @@ void fillColor(struct OutputInfo *output, struct Pixel color)
 
 void makeOutput(struct OutputInfo output)
 {
-    int x;
-    int y;
-    
     if (output.format == PPM)
     {
         printf("P3");
@@ -87,6 +180,7 @@ void makeOutput(struct OutputInfo output)
         printf("%d", MAX_COLOR);
         printf("\n");
         // Affichage des pixels
+/*
         for (y = 0 ; y < output.height ; y++)
         {
             for (x = 0 ; x < output.width ; x++)
@@ -95,6 +189,7 @@ void makeOutput(struct OutputInfo output)
             }
             printf("\n");
         }
+*/
     }
     
 }

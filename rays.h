@@ -14,8 +14,11 @@ extern "C" {
 
 struct LightRay set_ray(long, long, long, long, long, long);
 struct Pixel init_color(unsigned char, unsigned char, unsigned char);
-double intersection_sphere(struct Sphere, struct LightRay);
+float intersection_sphere(struct Sphere, struct LightRay);
 long findMaterialIdByName(struct Material*, char*, const long);
+float dotP3D(struct Point3D, struct Point3D);
+struct Point3D doOnAllPosition(struct Point3D, double, struct Point3D, double);
+float min(float, float);
 
 
 #ifdef	__cplusplus

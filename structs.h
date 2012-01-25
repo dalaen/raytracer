@@ -18,16 +18,16 @@ extern "C" {
 #define MAX_COLOR 255           // Max value of color gradiant
     
     struct Point3D {
-        long x;
-        long y;
-        long z;
+        float x;
+        float y;
+        float z;
     };
     
     struct Pixel
     {
-        unsigned char red;
-        unsigned char blue;
-        unsigned char green;
+        float red;
+        float blue;
+        float green;
     };
     
     struct Sphere {
@@ -54,10 +54,10 @@ extern "C" {
         float reflectionCoefficient;
     };
     
-    struct PointLight {
+    struct LightPoint {
         char* name;
         struct Point3D position; // x,y,z
-        long colorIntensity[3];
+        struct Pixel colorIntensity;
     };
     
     struct Camera {
@@ -89,7 +89,7 @@ extern "C" {
     struct Distance
     {
         long whatSphere;
-        double distance;
+        float distance;
     };
     
     enum Operation
@@ -99,8 +99,8 @@ extern "C" {
     
     union AttributeValue
     {
-        unsigned long longAttribute;
-        unsigned long arrayAttribute[5];
+        long longAttribute;
+        long arrayAttribute[5];
         char* stringAttribute;
         float floatAttribute;
     };

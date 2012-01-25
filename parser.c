@@ -25,7 +25,7 @@ struct Scene init_scene(long nbSphere, long width, long height)
     return myNewScene;
 }
 
-void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMaterials, struct Sphere **outSphere, long* nbSpheres, struct PointLight **outPointLight, long* nbPointsLight, struct Camera **outCamera, long* nbCameras, struct TriangleMesh** outTriangle, long* nbTriangles)
+void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMaterials, struct Sphere **outSphere, long* nbSpheres, struct LightPoint **outPointLight, long* nbPointsLight, struct Camera **outCamera, long* nbCameras, struct TriangleMesh** outTriangle, long* nbTriangles)
 {
     char buffer[MAX_LINE_SIZE];
     char* trim;
@@ -60,9 +60,9 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
         if (strstr(trim, "point_light") != NULL)
         {
             if (*nbPointsLight == 0)
-                *outPointLight = (struct PointLight*) malloc(sizeof(struct PointLight));
+                *outPointLight = (struct LightPoint*) malloc(sizeof(struct LightPoint));
             else if (*nbPointsLight > 0)
-                *outPointLight = (struct PointLight*) realloc(*outPointLight, sizeof(struct PointLight) * (*nbPointsLight + 1));
+                *outPointLight = (struct LightPoint*) realloc(*outPointLight, sizeof(struct LightPoint) * (*nbPointsLight + 1));
             (*outPointLight)[(*nbPointsLight)++] = parse_pointLight(&nbBracketsOpen);
         }
         if (strstr(trim, "camera") != NULL)
@@ -140,7 +140,6 @@ struct Material parse_material(unsigned long* nbBracketsOpen)
     struct LineData currentLine;
     char buffer[MAX_LINE_SIZE];
     char* trim;
-    long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
     initMaterial(result);
@@ -237,13 +236,12 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
     return result;
 }
 
-struct PointLight parse_pointLight(unsigned long* nbBracketsOpen)
+struct LightPoint parse_pointLight(unsigned long* nbBracketsOpen)
 {
-    struct PointLight result;
+    struct LightPoint result;
     struct LineData currentLine;
     char buffer[MAX_LINE_SIZE];
     char* trim;
-    long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
     initPointLight(result);
@@ -279,8 +277,9 @@ struct PointLight parse_pointLight(unsigned long* nbBracketsOpen)
             result.position = array2position(currentLine.attributeValue.arrayAttribute);
         else if (strcmp("color_intensity", currentLine.attributeName) == 0)
         {
-            for (i = 0 ; i < 2 ; i++)
-                result.colorIntensity[i] = currentLine.attributeValue.arrayAttribute[i];
+            result.colorIntensity.red = currentLine.attributeValue.arrayAttribute[0];
+            result.colorIntensity.green = currentLine.attributeValue.arrayAttribute[1];
+            result.colorIntensity.blue = currentLine.attributeValue.arrayAttribute[2];
         }
 
         free(currentLine.attributeName);
@@ -295,7 +294,6 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
     struct LineData currentLine;
     char buffer[MAX_LINE_SIZE];
     char* trim;
-    long i;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
     initCamera(result);
@@ -347,7 +345,7 @@ struct TriangleMesh parse_triangle(unsigned long* nbBracketsOpen)
     char buffer[MAX_LINE_SIZE];
     char* trim;
     static long nbVertexDone = 0;
-    static long nbFaces = 0;
+    //static long nbFaces = 0;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
     initTriangleMesh(result);
@@ -447,7 +445,6 @@ void parse_render(char** sceneFil, struct Camera** outCamera, const long* nbCame
 {
     char buffer[MAX_LINE_SIZE];
     char* trim;
-    char* temp = NULL;
     struct LineData currentLine;
     long i;
     int cameraFound = 0;
@@ -588,7 +585,7 @@ enum Operation getOperation(char* operation)
     return NOT_EQUAL;
 }
 
-unsigned long count_indent(const char* theString)
+unsigned long count_indent(char* theString)
 {
     // This function is trimming too
     unsigned long count = 0;
@@ -622,7 +619,7 @@ char* rtrim(char *s)
     return s;
 }
 
-void freeStructs(struct Material *outMaterial, long nbMaterials, struct Sphere *outSphere, long nbSpheres, struct PointLight *outPointLight, long nbPointsLight, struct Camera *outCamera, long nbCameras, struct TriangleMesh *outTriangle, long nbTriangles)
+void freeStructs(struct Material *outMaterial, long nbMaterials, struct Sphere *outSphere, long nbSpheres, struct LightPoint *outPointLight, long nbPointsLight, struct Camera *outCamera, long nbCameras, struct TriangleMesh *outTriangle, long nbTriangles)
 {
     long i;
     
@@ -681,7 +678,7 @@ char* clean_strdup(char* source) // Inline or not inline ?
     return temp;
 }
 
-struct Point3D array2position(unsigned long input[])
+struct Point3D array2position(long input[])
 {
     struct Point3D result;
     result.x = input[0];

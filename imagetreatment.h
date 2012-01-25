@@ -12,8 +12,8 @@
 extern "C" {
 #endif
 
-    void setPixel(struct OutputInfo*, long, long, unsigned char, unsigned char, unsigned char);
-    void buildImage(struct OutputInfo*, struct Material*, const long, struct Sphere*, const long);
+    void setPixel(struct OutputInfo*, long, long, float, float, float);
+    void buildImage(struct OutputInfo*, struct Material*, const long, struct Sphere*, const long, struct LightPoint*, const long);
     void fillColor(struct OutputInfo*, struct Pixel);
     void makeOutput(struct OutputInfo);
 
