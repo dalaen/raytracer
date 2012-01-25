@@ -14,7 +14,7 @@
 #include "spheres.h"
 
 // IMMA CHARGIN MAH LAZER
-void buildImage(const struct OutputInfo output, const struct Material* materials, const long nbMaterials, const struct Sphere* spheres, const long nbSpheres, const struct LightPoint* lightPoints, const long nbLightPoints)
+void buildImage(const struct OutputInfo output, const struct Material* materials, const long nbMaterials, const struct Sphere* spheres, const long nbSpheres, const struct LightPoint* lightPoints, const long nbLightPoints, const struct Camera* cameras, const long nbCameras)
 {
     struct Distance distance;
     struct LightRay ray;
@@ -25,6 +25,7 @@ void buildImage(const struct OutputInfo output, const struct Material* materials
     struct Pixel color;
     const long POV_OFFSET = -2000;          // Constitute the camera depth position
     long materialId;
+    long cameraId;
     long i;
     long j;
     long x;
@@ -36,6 +37,8 @@ void buildImage(const struct OutputInfo output, const struct Material* materials
     float norme;
     float reflect;
     int inShadow = 0;
+    
+    cameraId = findCameraIdUsed(cameras, nbCameras);
     
     for (y = 0 ; y < output.height ; y++)
     {

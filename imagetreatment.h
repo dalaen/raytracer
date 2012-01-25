@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-    void buildImage(const struct OutputInfo, const struct Material*, const long, const struct Sphere*, const long, const struct LightPoint*, const long);
+    void buildImage(const struct OutputInfo, const struct Material*, const long, const struct Sphere*, const long, const struct LightPoint*, const long, const struct Camera*, const long);
     void makeOutput(const struct OutputInfo);
     void printLine(const struct Pixel, const struct OutputInfo);
 

@@ -40,6 +40,16 @@ long findMaterialIdByName(const struct Material* haystack, char* name, const lon
     return -1;
 }
 
+long findCameraIdUsed(const struct Camera* haystack, const long nbCameras)
+{
+    long i;
+    
+    for (i = 0 ; i < nbCameras ; i++)
+        if (haystack->inUse)
+            return i;
+    return -1;
+}
+
 inline float dotP3D(struct Point3D a, struct Point3D b)
 {
     return (a.x * b.x + a.y * b.y + a.z * b.z);

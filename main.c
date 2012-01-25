@@ -47,18 +47,26 @@ int main(int argc, char** argv)
     /*************************************************************/
     for (i = 0 ; i < 0.5 * argc - 0.5; i++)
     {
-        if (strcmp(argv[getArrayLocationByI(i) - 1], "-s") == 0) // Scene file following
+        if (argv[getArrayLocationByI(i)])
         {
-            whichFilename[i] = &sceneFilename;
-            isConf[i] = true;
+            if (strcmp(argv[getArrayLocationByI(i) - 1], "-s") == 0) // Scene file following
+            {
+                whichFilename[i] = &sceneFilename;
+                isConf[i] = true;
+            }
+            else if (strcmp(argv[getArrayLocationByI(i) - 1], "-r") == 0)
+            {
+                whichFilename[i] = &renderFilename;
+                isConf[i] = true;
+            }
+            else if (strcmp(argv[getArrayLocationByI(i) - 1], "-o") == 0)
+                whichFilename[i] = &outputFilename;
         }
-        else if (strcmp(argv[getArrayLocationByI(i) - 1], "-r") == 0)
+        else
         {
-            whichFilename[i] = &renderFilename;
-            isConf[i] = true;
+            printf("You must use options associated with a filename!\n");
+            return(EXIT_FAILURE);
         }
-        else if (strcmp(argv[getArrayLocationByI(i) - 1], "-o") == 0)
-            whichFilename[i] = &outputFilename;
     }
     while (--i >= 0)
     {
@@ -94,7 +102,7 @@ int main(int argc, char** argv)
     
     makeOutput(output); // Next step : directly in the file ?
     // IMMA CHARGIN MAH LAZER
-    buildImage(output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints);
+    buildImage(output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints, cameras, nbCameras);
     
     free(renderFilename);
     free(sceneFilename);

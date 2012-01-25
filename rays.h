@@ -15,6 +15,7 @@ extern "C" {
 struct LightRay set_ray(float, float, float, float, float, float);
 struct Pixel init_color(unsigned char, unsigned char, unsigned char);
 long findMaterialIdByName(const struct Material*, char*, const long);
+long findCameraIdUsed(const struct Camera*, const long);
 inline float dotP3D(struct Point3D, struct Point3D);
 inline float min(float, float);
 
