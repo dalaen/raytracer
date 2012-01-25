@@ -101,6 +101,7 @@ extern "C" {
     {
         long longAttribute;
         long arrayAttribute[5];
+        float floatArrayAttribute[5];
         char* stringAttribute;
         float floatAttribute;
     };

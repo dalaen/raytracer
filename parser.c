@@ -173,9 +173,9 @@ struct Material parse_material(unsigned long* nbBracketsOpen)
             result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("diffuse_color", currentLine.attributeName) == 0)
         {
-            result.diffuseColor.red = currentLine.attributeValue.arrayAttribute[0];
-            result.diffuseColor.green = currentLine.attributeValue.arrayAttribute[1];
-            result.diffuseColor.blue = currentLine.attributeValue.arrayAttribute[2];
+            result.diffuseColor.red = currentLine.attributeValue.floatArrayAttribute[0];
+            result.diffuseColor.green = currentLine.attributeValue.floatArrayAttribute[1];
+            result.diffuseColor.blue = currentLine.attributeValue.floatArrayAttribute[2];
         }
         else if (strcmp("reflection_coefficient", currentLine.attributeName) == 0)
             result.reflectionCoefficient = currentLine.attributeValue.floatAttribute;
@@ -519,7 +519,9 @@ struct LineData parse_line(char* buffer)
     char* argument;
     char* stringArg;
     long isString = 0;
+    long wasFloat = 0;
     long temp = 0;
+    float tempf = 0;
     
     result.attributeValue.stringAttribute = NULL; // Initialization required
     if ((stringArg = strchr(buffer, '"')) != NULL) // there is a string
@@ -544,19 +546,34 @@ struct LineData parse_line(char* buffer)
             // Job already done, just keep the "else" working
         }
         else if (strchr(argument, '.') != NULL) // Is it a float number?
+        {
             result.attributeValue.floatAttribute = atof(argument);
+            wasFloat = 1;
+        }
         else
         {
             result.attributeValue.longAttribute = atol(argument);
+            wasFloat = 0;
         }
     }
     if (nextArgument() != NULL && !isString) // Is it an array?
     {
-        temp = result.attributeValue.longAttribute;
-        result.attributeValue.arrayAttribute[0] = temp;
-        result.attributeValue.arrayAttribute[1] = atol(argument);
-        if (nextArgument() != NULL)
-            result.attributeValue.arrayAttribute[2] = atol(argument);
+        if (!wasFloat)
+        {
+            temp = result.attributeValue.longAttribute;
+            result.attributeValue.arrayAttribute[0] = temp;
+            result.attributeValue.arrayAttribute[1] = atol(argument);
+            if (nextArgument() != NULL)
+                result.attributeValue.arrayAttribute[2] = atol(argument);
+        }
+        else if (wasFloat)
+        {
+            tempf = result.attributeValue.floatAttribute;
+            result.attributeValue.floatArrayAttribute[0] = tempf;
+            result.attributeValue.floatArrayAttribute[1] = atof(argument);
+            if (nextArgument() != NULL)
+                result.attributeValue.floatArrayAttribute[2] = atof(argument);
+        }
     }
     
     return result;
