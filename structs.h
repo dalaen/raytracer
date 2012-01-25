@@ -14,7 +14,7 @@ extern "C" {
 
 #define IMAGE_WIDTH 640         // Image's width
 #define IMAGE_HEIGHT 480        // Image's height
-#define IMAGE_DEPTH 500         // Image's depth (3D)
+#define IMAGE_DEPTH 1000         // Image's depth (3D)
 #define MAX_COLOR 255           // Max value of color gradiant
     
     struct Point3D {

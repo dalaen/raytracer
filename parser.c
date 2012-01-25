@@ -224,7 +224,7 @@ struct Sphere parse_sphere(unsigned long* nbBracketsOpen)
         if (strcmp("name", currentLine.attributeName) == 0)
             result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
-            result.origin = array2position(currentLine.attributeValue.arrayAttribute);
+            result.origin = array2position(currentLine.attributeValue.floatArrayAttribute);
         else if (strcmp("radius", currentLine.attributeName) == 0)
             result.radius = currentLine.attributeValue.floatAttribute;
         else if (strcmp("material", currentLine.attributeName) == 0)
@@ -274,12 +274,12 @@ struct LightPoint parse_pointLight(unsigned long* nbBracketsOpen)
         if (strcmp("name", currentLine.attributeName) == 0)
             result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
-            result.position = array2position(currentLine.attributeValue.arrayAttribute);
+            result.position = array2position(currentLine.attributeValue.floatArrayAttribute);
         else if (strcmp("color_intensity", currentLine.attributeName) == 0)
         {
-            result.colorIntensity.red = currentLine.attributeValue.arrayAttribute[0];
-            result.colorIntensity.green = currentLine.attributeValue.arrayAttribute[1];
-            result.colorIntensity.blue = currentLine.attributeValue.arrayAttribute[2];
+            result.colorIntensity.red = currentLine.attributeValue.floatArrayAttribute[0];
+            result.colorIntensity.green = currentLine.attributeValue.floatArrayAttribute[1];
+            result.colorIntensity.blue = currentLine.attributeValue.floatArrayAttribute[2];
         }
 
         free(currentLine.attributeName);
@@ -326,9 +326,9 @@ struct Camera parse_camera(unsigned long* nbBracketsOpen)
         if (strcmp("name", currentLine.attributeName) == 0)
             result.name = clean_strdup(currentLine.attributeValue.stringAttribute);
         else if (strcmp("position", currentLine.attributeName) == 0)
-            result.position = array2position(currentLine.attributeValue.arrayAttribute);
+            result.position = array2position(currentLine.attributeValue.floatArrayAttribute);
         else if (strcmp("look_at", currentLine.attributeName) == 0)
-            result.lookAt = array2position(currentLine.attributeValue.arrayAttribute);
+            result.lookAt = array2position(currentLine.attributeValue.floatArrayAttribute);
         else if (strcmp("projection_type", currentLine.attributeName) == 0)
         {
             if (strcmp(currentLine.attributeValue.stringAttribute, "orthographic") == 0)
@@ -436,7 +436,7 @@ struct Vertex parse_vertex(unsigned long* nbBracketsOpen)
         if (strcmp("id", currentLine.attributeName) == 0)
             result.id = currentLine.attributeValue.longAttribute;
         else if (strcmp("position", currentLine.attributeName) == 0)
-            result.position = array2position(currentLine.attributeValue.arrayAttribute);            
+            result.position = array2position(currentLine.attributeValue.floatArrayAttribute);            
 
         free(currentLine.attributeName);
     } while (*nbBracketsOpen > onCall_bracketsOpen);
@@ -698,7 +698,7 @@ char* clean_strdup(char* source) // Inline or not inline ?
     return temp;
 }
 
-struct Point3D array2position(long input[])
+struct Point3D array2position(float input[])
 {
     struct Point3D result;
     result.x = input[0];

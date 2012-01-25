@@ -33,7 +33,7 @@ char* ltrim(char*);
 void freeStructs(struct Material*, long, struct Sphere*, long, struct LightPoint*, long, struct Camera*, long, struct TriangleMesh*, long);
 
 char* clean_strdup(char*);
-struct Point3D array2position(long[]);
+struct Point3D array2position(float[]);
 
 
 #ifdef	__cplusplus
