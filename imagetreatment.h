@@ -12,10 +12,9 @@
 extern "C" {
 #endif
 
-    void setPixel(struct OutputInfo*, long, long, float, float, float);
-    void buildImage(struct OutputInfo*, struct Material*, const long, struct Sphere*, const long, struct LightPoint*, const long);
-    void fillColor(struct OutputInfo*, struct Pixel);
-    void makeOutput(struct OutputInfo);
+    void buildImage(const struct OutputInfo, const struct Material*, const long, const struct Sphere*, const long, const struct LightPoint*, const long);
+    void makeOutput(const struct OutputInfo);
+    void printLine(const struct Pixel, const struct OutputInfo);
 
 
 #ifdef	__cplusplus

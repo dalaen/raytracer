@@ -11,16 +11,10 @@
 #include "structs.h"
 #include "imagetreatment.h"
 #include "rays.h"
-
-void setPixel(struct OutputInfo *output, long x, long y, float red, float green, float blue)
-{
-    output->image[y][x].blue = 255.0 * blue;
-    output->image[y][x].green = 255.0 * green;
-    output->image[y][x].red = 255.0 * red;
-}
+#include "spheres.h"
 
 // IMMA CHARGIN MAH LAZER
-void buildImage(struct OutputInfo* output, struct Material* materials, const long nbMaterials, struct Sphere* spheres, const long nbSpheres, struct LightPoint* lightPoints, const long nbLightPoints)
+void buildImage(const struct OutputInfo output, const struct Material* materials, const long nbMaterials, const struct Sphere* spheres, const long nbSpheres, const struct LightPoint* lightPoints, const long nbLightPoints)
 {
     struct Distance distance;
     struct LightRay ray;
@@ -43,9 +37,9 @@ void buildImage(struct OutputInfo* output, struct Material* materials, const lon
     float reflect;
     int inShadow = 0;
     
-    for (y = 0 ; y < output->height ; y++)
+    for (y = 0 ; y < output.height ; y++)
     {
-        for (x = 0 ; x < output->width ; x++)
+        for (x = 0 ; x < output.width ; x++)
         {
             // Initializations...
             ray = set_ray(x, y, POV_OFFSET, 0, 0, 1);
@@ -77,6 +71,7 @@ void buildImage(struct OutputInfo* output, struct Material* materials, const lon
                     break;
                 
                 // New source of light
+                // TODO: clean those 3 lines into 1
                 intersection.x = ray.origin.x + distance.distance * ray.direction.x;
                 intersection.y = ray.origin.y + distance.distance * ray.direction.y;
                 intersection.z = ray.origin.z + distance.distance * ray.direction.z;
@@ -109,9 +104,7 @@ void buildImage(struct OutputInfo* output, struct Material* materials, const lon
                         norme = sqrt(dotP3D(directionLightPoint, directionLightPoint));
                         if (norme > 0.0)
                         {
-                            lightray.origin.x = intersection.x;
-                            lightray.origin.y = intersection.y;
-                            lightray.origin.z = intersection.z;
+                            lightray.origin = intersection;
                             lightray.direction.x = (1/norme) * directionLightPoint.x;
                             lightray.direction.y = (1/norme) * directionLightPoint.y;
                             lightray.direction.z = (1/norme) * directionLightPoint.z;
@@ -139,9 +132,7 @@ void buildImage(struct OutputInfo* output, struct Material* materials, const lon
                 reflectionCoefficient *= materials[materialId].reflectionCoefficient;
 
                 reflect = 2.0f * dotP3D(ray.direction, normale);
-                ray.origin.x = intersection.x;
-                ray.origin.y = intersection.y;
-                ray.origin.z = intersection.z;
+                ray.origin = intersection;
                 ray.direction.x -= reflect * normale.x;
                 ray.direction.y -= reflect * normale.y;
                 ray.direction.z -= reflect * normale.z;
@@ -149,27 +140,13 @@ void buildImage(struct OutputInfo* output, struct Material* materials, const lon
                 reflectionDepthLevel++;
             } while (reflectionCoefficient > 0.0 && reflectionDepthLevel < 10);
 
-            printf("%d %d %d\n", (unsigned char)min(255.0, 255.0 * color.red), (unsigned char)min(255.0, 255.0 * color.green), (unsigned char)min(255.0, 255.0 * color.blue));
+            printLine(color, output);
             //setPixel(output, x, y, min(1.0, red), min(1.0, green), min(1.0, blue));
         }
     }
 }
 
-void fillColor(struct OutputInfo *output, struct Pixel color)
-{
-    int x;
-    int y;
-    
-    for (y = 0 ; y < output->height ; y++)
-    {
-        for (x = 0 ; x < output->width ; x++)
-        {
-            setPixel(output, x, y, color.red, color.green, color.blue);
-        }
-    }
-}
-
-void makeOutput(struct OutputInfo output)
+void makeOutput(const struct OutputInfo output)
 {
     if (output.format == PPM)
     {
@@ -179,17 +156,11 @@ void makeOutput(struct OutputInfo output)
         printf("\n");
         printf("%d", MAX_COLOR);
         printf("\n");
-        // Affichage des pixels
-/*
-        for (y = 0 ; y < output.height ; y++)
-        {
-            for (x = 0 ; x < output.width ; x++)
-            {
-                printf("%d %d %d\n", output.image[y][x].red, output.image[y][x].green, output.image[y][x].blue);
-            }
-            printf("\n");
-        }
-*/
     }
-    
+}
+
+void printLine(const struct Pixel color, const struct OutputInfo output)
+{
+    if (output.format == PPM)
+        printf("%d %d %d\n", (unsigned char)min(255.0, 255.0 * color.red), (unsigned char)min(255.0, 255.0 * color.green), (unsigned char)min(255.0, 255.0 * color.blue));
 }

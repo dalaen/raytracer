@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-struct Sphere init_sphere(long originX, long originY, long originZ, float radius, long colorR, long colorG, long colorB);
+float intersection_sphere(struct Sphere, struct LightRay);
 
 
 #ifdef	__cplusplus

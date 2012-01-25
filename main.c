@@ -104,7 +104,7 @@ int main(int argc, char** argv)
     
     makeOutput(output); // Next step : directly in the file ?
     // IMMA CHARGIN MAH LAZER
-    buildImage(&output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints);
+    buildImage(output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints);
     
     free(renderFilename);
     free(sceneFilename);

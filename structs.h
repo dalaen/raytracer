@@ -122,7 +122,6 @@ extern "C" {
         enum FileFormat format;
         long width;
         long height;
-        struct Pixel image[IMAGE_HEIGHT][IMAGE_WIDTH];
     };
 
 #ifdef	__cplusplus
