@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "structs.h"
 #include "rays.h"
 #include "spheres.h"
@@ -34,51 +35,41 @@ int main(int argc, char** argv)
     
     char* sceneFilename = NULL;
     char* renderFilename = NULL;
-    char** whichFilename[2] = {NULL};
+    char* outputFilename = NULL;
+    char** whichFilename[3] = {NULL};
     
+    bool isConf[3] = {false};
     long i = 0;
-    /*
-    myImage.width = IMAGE_WIDTH;
-    myImage.height = IMAGE_HEIGHT;
-    myScene = init_scene(NB_SPHERE, IMAGE_WIDTH, IMAGE_HEIGHT);
-    fillColor(&myImage, blackColor); // Remplir l'image de noir
-    //*/
     
     // Should be moved to another file?
     /*************************************************************/
     /********************* CLI MANAGEMENT ************************/
     /*************************************************************/
-    if (argc >= 3) // First argument
+    for (i = 0 ; i < 0.5 * argc - 0.5; i++)
     {
-        if (strcmp(argv[1], "-s") == 0) // Scene file following
+        if (strcmp(argv[getArrayLocationByI(i) - 1], "-s") == 0) // Scene file following
         {
-            whichFilename[i++] = &sceneFilename;
+            whichFilename[i] = &sceneFilename;
+            isConf[i] = true;
         }
-        else if (strcmp(argv[1], "-r") == 0)
+        else if (strcmp(argv[getArrayLocationByI(i) - 1], "-r") == 0)
         {
-            whichFilename[i++] = &renderFilename;
+            whichFilename[i] = &renderFilename;
+            isConf[i] = true;
         }
+        else if (strcmp(argv[getArrayLocationByI(i) - 1], "-o") == 0)
+            whichFilename[i] = &outputFilename;
     }
-    if (argc >= 5) // Two arguments
-    {
-        if (strcmp(argv[3], "-s") == 0 && whichFilename[0] != &sceneFilename) // Scene file following
-        {
-            whichFilename[i++] = &sceneFilename;
-        }
-        else if (strcmp(argv[3], "-r") == 0 && whichFilename[0] != &renderFilename)
-        {
-            whichFilename[i++] = &renderFilename;
-        }
-    }
-
     while (--i >= 0)
     {
-        if (strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "conf") == 0) // If file's extension is "conf"
-        {
-            *whichFilename[i] = malloc(sizeof(char) * strlen(argv[getArrayLocationByI(i)]) + 1);
-            strcpy(*whichFilename[i], argv[getArrayLocationByI(i)]);
-        }
+        if (isConf[i] && strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "conf") == 0) // If file's extension is "conf"
+            *whichFilename[i] = strdup(argv[getArrayLocationByI(i)]);
+        else if (!isConf[i] && (strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "ppm") == 0 || strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "bmp") == 0))
+            *whichFilename[i] = strdup(argv[getArrayLocationByI(i)]);
+        else
+            printf("%s file has an incorrect extension. Allowed extensions: .conf, .ppm, .bmp\n", argv[getArrayLocationByI(i)]);
     }
+    printf("%s %s %s", sceneFilename, renderFilename, outputFilename);
     /*************************************************************/
     /****************** END CLI MANAGEMENT ***********************/
     /*************************************************************/
@@ -102,12 +93,13 @@ int main(int argc, char** argv)
         parse_render(&sceneFile, &cameras, &nbCameras, &output);
     }
     
-    makeOutput(output); // Next step : directly in the file ?
+    //makeOutput(output); // Next step : directly in the file ?
     // IMMA CHARGIN MAH LAZER
-    buildImage(output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints);
+    //buildImage(output, materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints);
     
     free(renderFilename);
     free(sceneFilename);
+    free(outputFilename);
     free(sceneFile);
     freeStructs(materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints, cameras, nbCameras, triangles, nbTriangles);
     

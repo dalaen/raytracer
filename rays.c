@@ -40,12 +40,12 @@ long findMaterialIdByName(const struct Material* haystack, char* name, const lon
     return -1;
 }
 
-float dotP3D(struct Point3D a, struct Point3D b)
+inline float dotP3D(struct Point3D a, struct Point3D b)
 {
     return (a.x * b.x + a.y * b.y + a.z * b.z);
 }
 
-float min(float a, float b)
+inline float min(float a, float b)
 {
     return (a > b) ? b : a;
 }

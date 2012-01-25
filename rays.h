@@ -15,9 +15,8 @@ extern "C" {
 struct LightRay set_ray(long, long, long, long, long, long);
 struct Pixel init_color(unsigned char, unsigned char, unsigned char);
 long findMaterialIdByName(const struct Material*, char*, const long);
-float dotP3D(struct Point3D, struct Point3D);
-struct Point3D doOnAllPosition(struct Point3D, double, struct Point3D, double);
-float min(float, float);
+inline float dotP3D(struct Point3D, struct Point3D);
+inline float min(float, float);
 
 
 #ifdef	__cplusplus
