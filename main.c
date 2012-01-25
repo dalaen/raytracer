@@ -69,7 +69,6 @@ int main(int argc, char** argv)
         else
             printf("%s file has an incorrect extension. Allowed extensions: .conf, .ppm, .bmp\n", argv[getArrayLocationByI(i)]);
     }
-    printf("%s %s %s", sceneFilename, renderFilename, outputFilename);
     /*************************************************************/
     /****************** END CLI MANAGEMENT ***********************/
     /*************************************************************/
