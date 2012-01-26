@@ -496,8 +496,8 @@ void parse_render(char** sceneFil, struct Camera** outCamera, const long* nbCame
         {
             if (strcmp("PPM", currentLine.attributeValue.stringAttribute) == 0)
                 output->format = PPM;
-            else if (strcmp("BMP", currentLine.attributeValue.stringAttribute))
-                output->format = BMP;
+            else if (strcmp("PPMB", currentLine.attributeValue.stringAttribute) == 0)
+                output->format = PPMB;
             else // default output format
                 output->format = PPM;
             free(currentLine.attributeValue.stringAttribute);

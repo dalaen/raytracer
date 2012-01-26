@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     {
         if (freopen(sceneFilename, "r", stdin) == NULL)
         {
-            fprintf(stderr, "Cannot open following file: %s", sceneFilename);
+            fprintf(stderr, "Cannot open following file: %s\n", sceneFilename);
             return(EXIT_FAILURE);
         }
         parse(&myScene, &materials, &nbMaterials, &spheres, &nbSpheres, &lightPoints, &nbLightPoints, &cameras, &nbCameras, &triangles, &nbTriangles);
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
     {
         if (freopen(renderFilename, "r", stdin) == NULL)
         {
-            fprintf(stderr, "Cannot open following file: %s", renderFilename);
+            fprintf(stderr, "Cannot open following file: %s\n", renderFilename);
             return(EXIT_FAILURE);
         }
         parse_render(&sceneFile, &cameras, &nbCameras, &output);

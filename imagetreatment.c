@@ -40,12 +40,12 @@ void buildImage(const struct OutputInfo output, const struct Material* materials
     
     cameraId = findCameraIdUsed(cameras, nbCameras);
     
-    for (y = 0 ; y < output.height ; y++)
+    for (y = cameras[cameraId].position.y - output.height / 2.0 ; y < cameras[cameraId].position.y + output.height / 2.0 ; y++)
     {
-        for (x = 0 ; x < output.width ; x++)
+        for (x = cameras[cameraId].position.x - output.width / 2.0 ; x < cameras[cameraId].position.x + output.width / 2.0 ; x++)
         {
             // Initializations...
-            ray = set_ray(x, y, POV_OFFSET, 0, 0, 1);
+            ray = set_ray(x, y, cameras[cameraId].position.z, cameras[cameraId].lookAt.x, cameras[cameraId].lookAt.y, cameras[cameraId].lookAt.z);
             color = init_color(0, 0, 0);
             reflectionCoefficient = 1.0;
             reflectionDepthLevel = 0;
@@ -152,18 +152,25 @@ void buildImage(const struct OutputInfo output, const struct Material* materials
 void makeOutput(const struct OutputInfo output)
 {
     if (output.format == PPM)
-    {
         printf("P3");
+    else if (output.format == PPMB)
+        printf("P6");
+    
         printf("\n");
         printf("%ld %ld", output.width, output.height);
         printf("\n");
         printf("%d", MAX_COLOR);
         printf("\n");
-    }
 }
 
 void printLine(const struct Pixel color, const struct OutputInfo output)
 {
     if (output.format == PPM)
         printf("%d %d %d\n", (unsigned char)min(255.0, 255.0 * color.red), (unsigned char)min(255.0, 255.0 * color.green), (unsigned char)min(255.0, 255.0 * color.blue));
+    else if (output.format == PPMB)
+    {
+        putchar((unsigned char)min(255.0, 255.0 * color.red));
+        putchar((unsigned char)min(255.0, 255.0 * color.green));
+        putchar((unsigned char)min(255.0, 255.0 * color.blue));
+    }
 }
