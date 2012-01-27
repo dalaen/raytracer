@@ -16,6 +16,8 @@
 #include "imagetreatment.h"
 #include "parser.h"
 #define getArrayLocationByI(i) 2*i+2
+#define isCLIOption(thisOne, i) strcmp(argv[getArrayLocationByI(i) - 1], thisOne) == 0
+#define getCLIFileExtension(i) strrchr(argv[getArrayLocationByI(i)], '.') + 1
 
 int main(int argc, char** argv)
 {
@@ -48,19 +50,37 @@ int main(int argc, char** argv)
     /*************************************************************/
     for (i = 0 ; i < 0.5 * argc - 0.5; i++)
     {
+        if (isCLIOption("-h", i)) // Display help
+        {
+            fprintf(stderr, "Welcome to raytracing 0.1.x\n\n");
+            fprintf(stderr, "SYNOPSIS\n");
+            fprintf(stderr, "raytracing -s scenefilename -r renderfilename > picture.ppm\n");
+            fprintf(stderr, "raytracing -s scenefilename -r renderfilename -o picture.ppm\n\n");
+            fprintf(stderr, "DESCRIPTION\n");
+            fprintf(stderr, "raytracing is a small student program capable of render 3D pictures featuring spheres, using raytracing technique.\n");
+            fprintf(stderr, "Output picture format supported : PPM, binary PPM\n\n");
+            fprintf(stderr, "\t-s file.conf : file.conf is going to be read by the program to take scene informations\n");
+            fprintf(stderr, "\t-r file.conf : file.conf is going to be read by the program to take rendering informations\n");
+            fprintf(stderr, "\t-o file.ppm : file.ppm is going to be written by the program and be made an picture of\n");
+            fprintf(stderr, "\t-h : displays the current help text\n\n");
+            fprintf(stderr, "Scene and Render configuration files extensions are required to be .conf\n");
+            fprintf(stderr, "Output picture file extension is required to be .ppm\n\n");
+            fprintf(stderr, "This program has been written by Xavier Poirot in France as for a project in school. Year 2011/2012\n");
+            return(EXIT_SUCCESS);
+        }
         if (argv[getArrayLocationByI(i)])
         {
-            if (strcmp(argv[getArrayLocationByI(i) - 1], "-s") == 0) // Scene file following
+            if (isCLIOption("-s", i)) // Scene file following
             {
                 whichFilename[i] = &sceneFilename;
                 isConf[i] = true;
             }
-            else if (strcmp(argv[getArrayLocationByI(i) - 1], "-r") == 0)
+            else if (isCLIOption("-r", i))
             {
                 whichFilename[i] = &renderFilename;
                 isConf[i] = true;
             }
-            else if (strcmp(argv[getArrayLocationByI(i) - 1], "-o") == 0)
+            else if (isCLIOption("-o", i))
                 whichFilename[i] = &outputFilename;
         }
         else
@@ -71,12 +91,12 @@ int main(int argc, char** argv)
     }
     while (--i >= 0)
     {
-        if (isConf[i] && strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "conf") == 0) // If file's extension is "conf"
+        if (isConf[i] && strcmp(getCLIFileExtension(i), "conf") == 0) // If file's extension is "conf"
             *whichFilename[i] = strdup(argv[getArrayLocationByI(i)]);
-        else if (!isConf[i] && (strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "ppm") == 0 || strcmp(strrchr(argv[getArrayLocationByI(i)], '.') + 1, "bmp") == 0))
+        else if (!isConf[i] && strcmp(getCLIFileExtension(i), "ppm") == 0)
             *whichFilename[i] = strdup(argv[getArrayLocationByI(i)]);
         else
-            fprintf(stderr, "%s file has an incorrect extension. Allowed extensions: .conf, .ppm, .bmp\n", argv[getArrayLocationByI(i)]);
+            fprintf(stderr, "%s file has an incorrect extension. Allowed extensions: .conf, .ppm\n", argv[getArrayLocationByI(i)]);
     }
     /*************************************************************/
     /****************** END CLI MANAGEMENT ***********************/
