@@ -11,7 +11,7 @@
 #define initMaterial(which) which.name = NULL
 #define initSphere(which) which.name = NULL; which.materialName = NULL
 #define initLightPoint(which) which.name = NULL
-#define initCamera(which) which.name = NULL
+#define initCamera(which) which.name = NULL; which.inUse = false;
 #define initTriangleMesh(which) which.name = NULL; which.vertexes = NULL
 #define initFace(which, by) which.type = by
 
@@ -491,7 +491,7 @@ void parse_render(char** sceneFil, struct Camera** outCamera, const long* nbCame
             {
                 if (strcmp(currentLine.attributeValue.stringAttribute, outCamera[i]->name) == 0)
                 {
-                    outCamera[i]->inUse = 1;
+                    outCamera[i]->inUse = true;
                     cameraFound = 1;
                 }
             }
@@ -516,7 +516,10 @@ void parse_render(char** sceneFil, struct Camera** outCamera, const long* nbCame
         free(currentLine.attributeName);
     }
     if (!cameraFound)
-        fprintf(stderr, "\nNo camera was specified in the render configuration file... Cannot process to any rendering");
+    {
+        fprintf(stderr, "\nNo camera was specified in the render configuration file... Cannot process to any rendering\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 

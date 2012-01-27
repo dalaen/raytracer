@@ -12,8 +12,7 @@
 extern "C" {
 #endif
 
-#define IMAGE_WIDTH 640         // Image's width
-#define IMAGE_HEIGHT 480        // Image's height
+#include <stdbool.h>
 #define IMAGE_DEPTH 1000         // Image's depth (3D)
 #define MAX_COLOR 255           // Max value of color gradiant
     
@@ -70,7 +69,7 @@ extern "C" {
         struct Point3D position; // x,y,z
         struct Point3D lookAt; // x,y,z
         enum ProjectionType projectionType;
-        int inUse;
+        bool inUse;
     };
 
     struct LightRay {
