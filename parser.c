@@ -10,7 +10,7 @@
 #define nextArgument() (argument = strtok(NULL, " "))
 #define initMaterial(which) which.name = NULL
 #define initSphere(which) which.name = NULL; which.materialName = NULL
-#define initPointLight(which) which.name = NULL
+#define initLightPoint(which) which.name = NULL
 #define initCamera(which) which.name = NULL
 #define initTriangleMesh(which) which.name = NULL; which.vertexes = NULL
 #define initFace(which, by) which.type = by
@@ -35,6 +35,11 @@ void parse(struct Scene *outScene, struct Material **outMaterial, long* nbMateri
     {
         trim = buffer;
         trim = trim(trim);
+        
+        if (is_comment(trim))
+            continue;
+        if (strlen(trim) == 0)
+            continue;
 
         // First the scene
         if (strstr(trim, "scene") != NULL)
@@ -244,7 +249,7 @@ struct LightPoint parse_pointLight(unsigned long* nbBracketsOpen)
     char* trim;
     unsigned long onCall_bracketsOpen = *nbBracketsOpen;
     
-    initPointLight(result);
+    initLightPoint(result);
     
     do
     {
