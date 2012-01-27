@@ -100,6 +100,14 @@ int main(int argc, char** argv)
         }
         parse_render(&sceneFile, &cameras, &nbCameras, &output);
     }
+    if (outputFilename != NULL)
+    {
+        if (freopen(outputFilename, "w", stdout) == NULL)
+        {
+            fprintf(stderr, "Cannot open following file: %s\n", renderFilename);
+            return(EXIT_FAILURE);
+        }
+    }
     
     makeOutput(output); // Next step : directly in the file ?
     // IMMA CHARGIN MAH LAZER

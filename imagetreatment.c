@@ -95,7 +95,7 @@ void buildImage(const struct OutputInfo output, const struct Material* materials
                 
                 // Find the material of the closest Sphere to the PoV
                 materialId = findMaterialIdByName(materials, spheres[distance.whatSphere].materialName, nbMaterials);
-
+                
                 // Sum of all light points
                 for (j = 0 ; j < nbLightPoints ; j++)
                 {
@@ -144,7 +144,6 @@ void buildImage(const struct OutputInfo output, const struct Material* materials
             } while (reflectionCoefficient > 0.0 && reflectionDepthLevel < 10);
 
             printLine(color, output);
-            //setPixel(output, x, y, min(1.0, red), min(1.0, green), min(1.0, blue));
         }
     }
 }
