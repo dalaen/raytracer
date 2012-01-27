@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 #include "structs.h"
 #include "rays.h"
 #include "spheres.h"
@@ -109,6 +110,8 @@ int main(int argc, char** argv)
     free(outputFilename);
     free(sceneFile);
     freeStructs(materials, nbMaterials, spheres, nbSpheres, lightPoints, nbLightPoints, cameras, nbCameras, triangles, nbTriangles);
+    
+    fprintf(stderr, "Program executed in: %.3lf s\n", (double)clock() / (double)CLOCKS_PER_SEC);
     
     return (EXIT_SUCCESS);
 }
